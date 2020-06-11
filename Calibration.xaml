@@ -1,0 +1,17 @@
+﻿<Window x:Class="DauBe_WTF.Calibration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DauBe_WTF"
+        mc:Ignorable="d"
+        Title="Calibration" Height="359.345" Width="642.718">
+    <Grid>
+        <Button x:Name="btnBall" Content="OK" HorizontalAlignment="Left" Margin="437,69,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="btnRemoveBall" Content="OK" HorizontalAlignment="Left" Margin="437,100,0,0" VerticalAlignment="Top" Width="75" Visibility="Hidden"/>
+        <Label Content="Veuillez mettre la balle en caoutchouc en place, puis cliquez sur OK" HorizontalAlignment="Left" Margin="67,66,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblRemoveBall" Content="." HorizontalAlignment="Left" Margin="67,128,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="load" Content="." HorizontalAlignment="Left" Margin="67,97,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

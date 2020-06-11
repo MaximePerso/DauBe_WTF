@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DauBe_WTF", "DauBe_WTF.csproj", "{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Debug|x86.ActiveCfg = Debug|x86
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Debug|x86.Build.0 = Debug|x86
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Release|x86.ActiveCfg = Release|x86
+		{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3B6DE217-9FEF-4643-B828-1424270CD343}
+	EndGlobalSection
+EndGlobal
