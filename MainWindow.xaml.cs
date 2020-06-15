@@ -52,8 +52,8 @@ namespace DauBe_WTF
         // Loading variables
         public Globals ListData = new Globals();
         //private RealTimeChart NewINstanceOfChart;
-        private RealTimeChartsVM NewINstanceOfChart;
-        private RealTimeCharts NewINstanceOfChart2;
+        private MainVM NewINstanceOfChart;
+        //private RealTimeCharts NewINstanceOfChart2;
         public delegate void update(double time, double position, double load, double extension);
 
 
@@ -61,7 +61,7 @@ namespace DauBe_WTF
         {
             InitializeComponent();
             //NewINstanceOfChart = new RealTimeChartsVM();
-            DataContext = new RealTimeChartsVM();
+            DataContext = new MainVM();
         }
 
         private void Window_Loaded(object sender, EventArgs e)
@@ -661,8 +661,8 @@ namespace DauBe_WTF
 
         private void btnGraph_Click(object sender, RoutedEventArgs e)
         {
-            NewINstanceOfChart2 = new RealTimeCharts();
-            NewINstanceOfChart2.Show();
+            //NewINstanceOfChart2 = new RealTimeCharts();
+            //NewINstanceOfChart2.Show();
             //    var thread = new Thread(() =>
             //    {
             //        NewINstanceOfChart2 = new RealTimeCharts();

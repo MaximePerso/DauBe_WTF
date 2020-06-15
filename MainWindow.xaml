@@ -27,24 +27,59 @@
     </Window.Resources>
 
     <Grid x:Name="mainGrid" RenderTransformOrigin="0.697,0.415">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="794*"/>
+            <ColumnDefinition Width="933*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="137*"/>
             <RowDefinition Height="253*"/>
         </Grid.RowDefinitions>
-        <Grid Margin="10,20,0,0" Grid.Row="0">
-            <TextBox x:Name="guiTime" HorizontalAlignment="Left" Height="35" Margin="98,41,0,0" TextWrapping="Wrap" Text="0.000" VerticalAlignment="Top" Width="120" FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
-            <TextBox x:Name="guiPosition" HorizontalAlignment="Left" Height="35" Margin="258,41,0,0" TextWrapping="Wrap" Text="0.000" VerticalAlignment="Top" Width="120" FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
-            <TextBox x:Name="guiLoad" HorizontalAlignment="Left" Height="35" Margin="427,41,0,0" TextWrapping="Wrap" Text="0.000" VerticalAlignment="Top" Width="120" FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
-            <TextBox x:Name="guiExtension" HorizontalAlignment="Left" Height="35" Margin="589,41,0,0" TextWrapping="Wrap" Text="0.000" VerticalAlignment="Top" Width="120" FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
-            <Label Content="Time [s]" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="3.658,1.154" Margin="123,10,0,0" FontWeight="Bold" Cursor="" FontSize="16" Height="31" Width="71"/>
-            <Label Content="Position [mm]" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="3.658,1.154" Margin="264,10,0,0" FontWeight="Bold" Cursor="" FontSize="16" Height="31" Width="116"/>
-            <Label Content="Load [N]" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="3.658,1.154" Margin="446,10,0,0" FontWeight="Bold" Cursor="" FontSize="16" Height="31" Width="75"/>
-            <Label Content="Extension [mm]" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="3.658,1.154" Margin="587,10,0,0" FontWeight="Bold" Cursor="" FontSize="16" Height="31" Width="128"/>
-            <Button x:Name="btnOn" Content="On" HorizontalAlignment="Left" Margin="852,41,0,0" VerticalAlignment="Top" Width="76" Height="20"/>
+        <Grid Name="DataDisplay"  Grid.Row="0" Grid.Column="0">
+            <StackPanel HorizontalAlignment="Center" Orientation="Vertical" VerticalAlignment="Top" MinHeight="225" MinWidth="790">
+                <StackPanel HorizontalAlignment="Center" MinHeight="70">
+                    <StackPanel Orientation="Horizontal">
+                        <Label HorizontalContentAlignment="Center" Content="Time [s]" FontWeight="Bold" Cursor="" FontSize="16" Height="35" Width="130"/>
+                        <Separator Margin="10"/>
+                        <Label HorizontalContentAlignment="Center" Content="Position [mm]" FontWeight="Bold" Cursor="" FontSize="16" Height="35" Width="130"/>
+                        <Separator Margin="10"/>
+                        <Label HorizontalContentAlignment="Center" Content="Load [N]" FontWeight="Bold" Cursor="" FontSize="16" Height="35" Width="130"/>
+                        <Separator Margin="10"/>
+                        <Label HorizontalContentAlignment="Center" Content="Extension [mm]" FontWeight="Bold" Cursor="" FontSize="16" Height="35" Width="130"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="guiTime" Height="35" Width="130" Text="0.000"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <Separator Margin="10"/>
+                        <TextBox x:Name="guiPosition" Height="35" Width="130" Text="0.000"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <Separator Margin="10"/>
+                        <TextBox x:Name="guiLoad" Height="35" Width="130" Text="0.000"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <Separator Margin="10"/>
+                        <TextBox x:Name="guiExtension" Height="35" Width="130" Text="0.000"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                    </StackPanel>
+                </StackPanel>
+                <Separator Margin="30" Width="0"/>
+                <StackPanel Margin="0">
+                    <RichTextBox x:Name="guiDebug" Height="94" Margin="40,0" VerticalAlignment="Bottom" Width="auto" >
+                        <FlowDocument />
+                    </RichTextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="btnOn" Content="On" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
+                    <Button x:Name="btnOff" Content="Off" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="0" Grid.Column="1">
+            <StackPanel Orientation="Vertical" >
+                <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" Height="Auto"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" Margin="63,65,0,0" VerticalAlignment="Top" Width="76" Grid.ColumnSpan="2"/>
+                <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left" Margin="63,103,0,0" VerticalAlignment="Top" Width="76" Grid.ColumnSpan="2"/>
+            </StackPanel>
+        </Grid>
+        <Grid Margin="10,0,0,0" Grid.Row="0" Grid.ColumnSpan="2">
             <Label x:Name="lblDestination" Content="" HorizontalAlignment="Left" Margin="272,379,0,0" VerticalAlignment="Top" Height="19" Width="10"/>
-            <RichTextBox x:Name="guiDebug" HorizontalAlignment="Left" Height="94" Margin="53,304,0,0" VerticalAlignment="Top" Width="756">
-                <FlowDocument/>
-            </RichTextBox>
             <TabControl HorizontalAlignment="Left" Height="234" Margin="814,88,0,0" VerticalAlignment="Top" Width="774">
                 <TabItem x:Name="controlTab" Header="Control">
                     <Grid Background="#FFE5E5E5">
@@ -52,8 +87,6 @@
                             <ColumnDefinition Width="74*"/>
                             <ColumnDefinition Width="695*"/>
                         </Grid.ColumnDefinitions>
-                        <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" Margin="63,65,0,0" VerticalAlignment="Top" Width="76" Grid.ColumnSpan="2"/>
-                        <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left" Margin="63,103,0,0" VerticalAlignment="Top" Width="76" Grid.ColumnSpan="2"/>
                         <TextBox x:Name="defaultVel" HorizontalAlignment="Left" Height="23" Margin="41,164,0,0" TextWrapping="Wrap" Text="1.0" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
                         <Label Content="Velocity" HorizontalAlignment="Left" Margin="21,136,0,0" VerticalAlignment="Top"/>
                         <Label Content="Control" HorizontalAlignment="Left" Margin="164.5,10,0,0" VerticalAlignment="Top" Grid.Column="1"/>
@@ -75,7 +108,7 @@
                 </TabItem>
             </TabControl>
         </Grid>
-        <Grid Margin="10,20,0,0" Grid.Row="1">
+        <Grid Margin="10,20,0,0" Grid.Row="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="200"/>
