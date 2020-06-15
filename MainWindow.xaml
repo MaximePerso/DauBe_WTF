@@ -48,7 +48,7 @@
                         <Label HorizontalContentAlignment="Center" Content="Extension [mm]" FontWeight="Bold" Cursor="" FontSize="16" Height="35" Width="130"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox x:Name="guiTime" Height="35" Width="130" Text="0.000"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <TextBox x:Name="guiTime" Height="35" Width="130" Text="{Binding DoliTime}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
                         <Separator Margin="10"/>
                         <TextBox x:Name="guiPosition" Height="35" Width="130" Text="0.000"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
                         <Separator Margin="10"/>
@@ -70,25 +70,43 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="0" Grid.Column="1">
-            <StackPanel Orientation="Vertical" >
-                <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" Height="Auto"/>
-            </StackPanel>
             <StackPanel Orientation="Vertical">
-                <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" Margin="63,65,0,0" VerticalAlignment="Top" Width="76" Grid.ColumnSpan="2"/>
-                <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left" Margin="63,103,0,0" VerticalAlignment="Top" Width="76" Grid.ColumnSpan="2"/>
+                <StackPanel Orientation="Vertical" >
+                    <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" Height="Auto"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Width="120" HorizontalAlignment="Left">
+                    <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Pictures/arrow.png" Stretch="Uniform"/>
+                        </Button.Background>
+                    </Button>
+                    <StackPanel>
+                    <Label Content="Velocity" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                        
+                    </StackPanel>
+                    <TextBox x:Name="defaultVel" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="1.0" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
+
+                    <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Pictures/arrow.png" Stretch="Uniform">
+                                <ImageBrush.RelativeTransform>
+                                    <RotateTransform CenterX="0.5" CenterY="0.5" Angle="180"/>
+                                </ImageBrush.RelativeTransform>
+                            </ImageBrush>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
             </StackPanel>
         </Grid>
         <Grid Margin="10,0,0,0" Grid.Row="0" Grid.ColumnSpan="2">
             <Label x:Name="lblDestination" Content="" HorizontalAlignment="Left" Margin="272,379,0,0" VerticalAlignment="Top" Height="19" Width="10"/>
-            <TabControl HorizontalAlignment="Left" Height="234" Margin="814,88,0,0" VerticalAlignment="Top" Width="774">
+            <TabControl HorizontalAlignment="Left" Height="234" Margin="933,136,0,0" VerticalAlignment="Top" Width="774">
                 <TabItem x:Name="controlTab" Header="Control">
                     <Grid Background="#FFE5E5E5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="74*"/>
                             <ColumnDefinition Width="695*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="defaultVel" HorizontalAlignment="Left" Height="23" Margin="41,164,0,0" TextWrapping="Wrap" Text="1.0" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
-                        <Label Content="Velocity" HorizontalAlignment="Left" Margin="21,136,0,0" VerticalAlignment="Top"/>
                         <Label Content="Control" HorizontalAlignment="Left" Margin="164.5,10,0,0" VerticalAlignment="Top" Grid.Column="1"/>
                         <Button Content="Go" HorizontalAlignment="Left" Margin="147.5,162,0,0" VerticalAlignment="Top" Width="76" Grid.Column="1"/>
                         <TextBox x:Name="destination" HorizontalAlignment="Left" Height="23" Margin="121.5,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Grid.Column="1"/>

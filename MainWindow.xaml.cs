@@ -61,7 +61,16 @@ namespace DauBe_WTF
         {
             InitializeComponent();
             //NewINstanceOfChart = new RealTimeChartsVM();
+            //Doli code was not written to be easily used using WPF, or MVVM. We need an extra step to bind data fomr the codebehind (here) to the viewmodel.
+            TheAllMightyBinder();
             DataContext = new MainVM();
+        }
+
+        private void TheAllMightyBinder()
+        {
+            var binding = new Binding("DoliData");
+            binding.Mode = BindingMode.OneWay;
+            SetBinding(DoliData, binding);
         }
 
         private void Window_Loaded(object sender, EventArgs e)
@@ -221,6 +230,23 @@ namespace DauBe_WTF
 
         #region DoPE Events
         private Int32 LastTime = Environment.TickCount;
+        public static readonly DependencyProperty DoliData = DependencyProperty.Register("CBDoliData", typeof(Dictionary<string, double>), typeof(MainWindow), new UIPropertyMetadata(null));
+        public Dictionary<string, double> CBDoliData
+        {
+            get { return (Dictionary<string,double>)GetValue(DoliData); }
+            set { SetValue(DoliData, value); }
+        }
+
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (e.Property == DoliData)
+            {
+                string text = String.Format("{0}", CBDoliData["Time"].ToString("0.000"));
+                guiTime.Text = text;
+            }
+            base.OnPropertyChanged(e);
+        }
+
         private int OnData(ref DoPE.OnData Data, object Parameter)
         {
             DoPE.Data Sample = Data.Data;
@@ -257,9 +283,10 @@ namespace DauBe_WTF
                     LastTime = Time;
                     String text;
                     Double temp;
-                    temp = Sample.Time;
-                    text = String.Format("{0}", temp.ToString("0.000"));
-                    guiTime.Text = text;
+                    CBDoliData["Time"] = Sample.Time;
+                    //temp = Sample.Time;
+                    //text = String.Format("{0}", temp.ToString("0.000"));
+                    //guiTime.Text = text;
 
                     temp = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S];
                     text = String.Format("{0}", temp.ToString("0.000"));

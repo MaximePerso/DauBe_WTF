@@ -89,6 +89,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MainVM.cs" />
+    <Compile Include="Utility\VMBase.cs" />
     <Compile Include="WpfGraphControl.cs" />
     <Page Include="Calibration.xaml">
       <SubType>Designer</SubType>
@@ -158,8 +159,10 @@
     <Content Include="DoPENet.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Pictures\arrow.png" />
     <Content Include="RealTimeGraphX.dll" />
     <Content Include="RealTimeGraphX.WPF.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
