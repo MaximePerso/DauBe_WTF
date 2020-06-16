@@ -49,6 +49,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         private double _velocity;
         private double _destination;
         private DoPE.CTRL _selectedMoveCTRL;
+        private bool _isDoliOn;
         #endregion
         #endregion
         #region Properties
@@ -141,6 +142,12 @@ namespace DauBe_WTF.ViewModel.SubVM
         }
         #endregion
         #region Doli setup
+        public bool IsDoliOn
+        {
+            get => _isDoliOn;
+            set 
+            { _isDoliOn = value; OnPropertyChanged("IsDoliOn"); }
+        }
         public string TextDisplay
         {
             get => _textDisplay;
@@ -180,6 +187,10 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         #endregion
         #endregion
+        #region Commands
+        public ICommand DoliOnCommand { get; set; }
+        public ICommand DoliOffCommand { get; set; }
+        #endregion
         #endregion
 
         #region INITIALISATION
@@ -217,9 +228,20 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         public DoliVM()
         {
-            _velocity = 179998;
+            Initialisation();
+            //ConnectToEdc();
         }
 
+        #region Private methods
+        private void Initialisation()
+        {
+            //Doli param
+            _isDoliOn = false;
+            //Commands ini
+            DoliOnCommand = new RelayCommand(o => DoliOn(), o => { return !_isDoliOn; });
+            DoliOffCommand = new RelayCommand(o => DoliOff(), o => { return _isDoliOn; });
+        }
+        #endregion  
         ///----------------------------------------------------------------------
         /// <summary>Connect to EDC</summary>
         ///----------------------------------------------------------------------
@@ -305,6 +327,10 @@ namespace DauBe_WTF.ViewModel.SubVM
         {
             if (error != DoPE.ERR.NOERROR)
                 Display(Text + " Error: " + error + "\n");
+            else if(IsDoliOn == true)
+            {
+                Display("Doli is ON ! \n");
+            }
         }
 
         ///----------------------------------------------------------------------
@@ -313,6 +339,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         private void Display(string Text)
         {
             TextDisplay += Text;
+            Console.WriteLine(TextDisplay);
             //guiDebug.AppendText(Text);
             //guiDebug.UpdateLayout();
         }
@@ -320,14 +347,15 @@ namespace DauBe_WTF.ViewModel.SubVM
         ///----------------------------------------------------------------------
         /// <summary>Activates the EDC's drive.</summary>
         ///----------------------------------------------------------------------
-        private void guiOn_Click(object sender, RoutedEventArgs e)
+        private void DoliOn()
         {
+            IsDoliOn = true;
             try
             {
                 DoPE.ERR error = MyEdc.Move.On();
                 DisplayError(error, "On");
                 var emergency = new Emergency(MyEdc, MyTan);
-                emergency.Show();
+                //emergency.Show();
             }
             catch (NullReferenceException)
             {
@@ -338,8 +366,9 @@ namespace DauBe_WTF.ViewModel.SubVM
         ///----------------------------------------------------------------------
         /// <summary>Deactivates the EDC's drive.</summary>
         ///----------------------------------------------------------------------
-        private void guiOff_Click(object sender, EventArgs e)
+        private void DoliOff()
         {
+            IsDoliOn = false;
             try
             {
                 DoPE.ERR error = MyEdc.Move.Off();
@@ -379,8 +408,8 @@ namespace DauBe_WTF.ViewModel.SubVM
                     ListData.load.Add(Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F]);
                     ListData.extend.Add(Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E]);
 
-                    update pass = new update(NewINstanceOfChart.UpdateValues);
-                    pass(ListData.time.Last(), ListData.position.Last(), ListData.load.Last(), ListData.extend.Last());
+                    //update pass = new update(NewINstanceOfChart.UpdateValues);
+                    //pass(ListData.time.Last(), ListData.position.Last(), ListData.load.Last(), ListData.extend.Last());
 
                     LastTime = Time;
 

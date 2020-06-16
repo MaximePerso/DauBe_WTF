@@ -6,11 +6,15 @@
         xmlns:local="clr-namespace:DauBe_WTF"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         xmlns:main="clr-namespace:DauBe_WTF.ViewModel"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:subvm="clr-namespace:DauBe_WTF.ViewModel.SubVM"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1261" Width="1735" Loaded="Window_Loaded"
-        d:DataContext="{d:DesignData Type=local:RealTimeChartsVM, IsDesignTimeCreatable=False}">
-
+        Title="MainWindow" Height="1261" Width="1735" Loaded="Window_Loaded">
+    
+    <!--d:DataContext="{d:DesignData Type=local:RealTimeChartsVM, IsDesignTimeCreatable=False}">-->
+    <Window.DataContext>
+        <main:MainVM/>
+    </Window.DataContext>
     <Window.Resources>
         <collections:ArrayList x:Key="colors">
             <Color>DodgerBlue</Color>
@@ -28,6 +32,7 @@
         </collections:ArrayList>
 
         <subvm:DoliVM x:Key="doli"/>
+        <subvm:GraphVM x:Key="graph"/>
     </Window.Resources>
 
     <Grid x:Name="mainGrid" RenderTransformOrigin="0.697,0.415">
@@ -39,7 +44,7 @@
             <RowDefinition Height="137*"/>
             <RowDefinition Height="253*"/>
         </Grid.RowDefinitions>
-        <Grid Name="DataDisplay"  Grid.Row="0" Grid.Column="0">
+        <Grid Name="DataDisplay"  Grid.Row="0" Grid.Column="0" DataContext="{Binding Path=doli}">
             <StackPanel HorizontalAlignment="Center" Orientation="Vertical" VerticalAlignment="Top" MinHeight="225" MinWidth="790">
                 <StackPanel HorizontalAlignment="Center" MinHeight="70">
                     <StackPanel Orientation="Horizontal">
@@ -66,18 +71,18 @@
                     <RichTextBox x:Name="guiDebug" Height="94" Margin="40,0" VerticalAlignment="Bottom" Width="auto" >
                         <FlowDocument>
                             <Paragraph>
-                                <Run Text="{Binding Display}"/>
+                                <Run Text="{Binding TextDisplay}"/>
                             </Paragraph>
                         </FlowDocument>
                     </RichTextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button x:Name="btnOn" Content="On" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40" Click="guiOn_Click"/>
-                    <Button x:Name="btnOff" Content="Off" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
+                    <Button Command="{Binding DoliOnCommand}" Content="On" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
+                    <Button Command="{Binding DoliOffCommand}" Content="Off" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="0" Grid.Column="1">
+        <Grid Grid.Row="0" Grid.Column="1" DataContext="{StaticResource doli}">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Vertical" >
                     <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" Height="Auto"/>
@@ -134,7 +139,7 @@
                 </TabItem>
             </TabControl>
         </Grid>
-        <Grid Margin="10,20,0,0" Grid.Row="1" Grid.ColumnSpan="2">
+        <Grid DataContext="{StaticResource graph}" Margin="10,20,0,0" Grid.Row="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="200"/>

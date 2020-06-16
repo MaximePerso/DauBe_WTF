@@ -54,7 +54,7 @@ namespace DauBe_WTF
         // Loading variables
         public Globals ListData = new Globals();
         //private RealTimeChart NewINstanceOfChart;
-        private MainVM NewINstanceOfChart;
+        private GraphVM NewINstanceOfChart;
         //private RealTimeCharts NewINstanceOfChart2;
         public delegate void update(double time, double position, double load, double extension);
 
@@ -81,10 +81,11 @@ namespace DauBe_WTF
             // Set the control-combobox to "position".
             guiControl.SelectedIndex = (int)DoPE.CTRL.POS;
 
+            ((DauBe_WTF.ViewModel.MainVM)DataContext).doli.ConnectToEdc();
             // Connect to EDC
-            ConnectToEdc();
+            //ConnectToEdc();
         }
-
+        
 
         ///----------------------------------------------------------------------
         /// <summary>Connect to EDC</summary>
@@ -249,19 +250,19 @@ namespace DauBe_WTF
                     ListData.load.Add(Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F]);
                     ListData.extend.Add(Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E]);
 
-                    update pass = new update(NewINstanceOfChart.UpdateValues);
-                    pass(ListData.time.Last(), ListData.position.Last(), ListData.load.Last(), ListData.extend.Last());
+                    //update pass = new update(NewINstanceOfChart.UpdateValues);
+                    //pass(ListData.time.Last(), ListData.position.Last(), ListData.load.Last(), ListData.extend.Last());
 
                     LastTime = Time;
 
                     //il faudrait utiliser une property dependency pour optimiser l'utilisation de la mémoire
-                    ((GraphVM)(this.DataContext)).DoliTime = Sample.Time;
+                    /*((GraphVM)(this.DataContext)).DoliTime = Sample.Time;
 
                     ((GraphVM)(this.DataContext)).DoliPosition = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S];
 
                     ((GraphVM)(this.DataContext)).DoliLoad = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F];
 
-                    ((GraphVM)(this.DataContext)).DoliExtend = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E];
+                    ((GraphVM)(this.DataContext)).DoliExtend = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E];*/
                 }
             }
             return 0;
