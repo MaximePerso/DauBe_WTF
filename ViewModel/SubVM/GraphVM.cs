@@ -11,11 +11,12 @@ using System;
 using System.Windows.Threading;
 using System.Windows.Forms;
 using DauBe_WTF.Utility;
+using System.Windows.Input;
 
-namespace DauBe_WTF
+namespace DauBe_WTF.ViewModel.SubVM
 
 {
-    public class MainVM : VMBase
+    public class GraphVM : VMBase
     {
         #region Fields
         #region Doli outputs
@@ -34,21 +35,22 @@ namespace DauBe_WTF
         private Double _tarePosition;
         private Double _tareExtend;
         private Double _xMax;
+        private string _display;
         #endregion
 
         #region Properties
         #region Doli outputs
-        public Dictionary<string,double> DoliData
-        {
-            get => _doliData;
-            set 
-            { _doliData = value; OnPropertyChanged("DoliData"); }
-        }
+        //public Dictionary<string,double> DoliData
+        //{
+        //    get => _doliData;
+        //    set 
+        //    { _doliData = value; OnPropertyChanged("DoliData"); }
+        //}
         public double DoliTime
         {
-            get => _doliData["Time"];
+            get => _doliTime;
             set
-            { _doliData["Time"] = value - _tareTime; OnPropertyChanged("DoliTime"); }
+            { _doliTime = value - _tareTime; OnPropertyChanged("DoliTime"); }
         }
         public double DoliLoad
         {
@@ -122,6 +124,12 @@ namespace DauBe_WTF
             get => _xMax;
             set
             { _xMax = value; OnPropertyChanged("XMax"); } }
+        //public string Display
+        //{
+        //    get => _display;
+        //    set
+        //    { _display = value; OnPropertyChanged("Display"); }
+        //}
         #endregion
 
 
@@ -129,12 +137,18 @@ namespace DauBe_WTF
 
         public Globals measures = new Globals();
 
-        public MainVM()
+        public GraphVM()
         {
+            CommandInitialisation();
+
             MultiController = new WpfGraphController<DoubleDataPoint, DoubleDataPoint>();
             MultiController.Range.MinimumY = 0;
             MultiController.Range.MaximumY = 1080;
             MultiController.Range.AutoY = true;
+            _tareTime = 0;
+            _tareLoad = 0;
+            _tarePosition = 0;
+            _tareExtend = 0;
 
             MultiController.DataSeriesCollection.Add(new WpfGraphDataSeries()
             {
@@ -154,11 +168,6 @@ namespace DauBe_WTF
                 Stroke = Colors.Blue,
             });
 
-            DoliData = new Dictionary<string, double>();
-            DoliData.Add("Time", 0.0);
-            DoliData.Add("Position", 0.0);
-            DoliData.Add("Load", 0.0);
-            DoliData.Add("Extend", 0.0);
 
         }
 
@@ -193,6 +202,10 @@ namespace DauBe_WTF
 
         }
 
-
+        public ICommand DoliOn;
+        private void CommandInitialisation()
+        {
+            //DoliOn = new RelayCommand(o => )
+        }
     }
 }

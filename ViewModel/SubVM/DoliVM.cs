@@ -12,19 +12,176 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using DauBe_WTF.ViewModel;
-using DauBe_WTF.ViewModel.SubVM;
 using Doli.DoPE;
+using DauBe_WTF.Utility;
 using System.Threading;
 using System.Windows.Threading;
 
-namespace DauBe_WTF
+namespace DauBe_WTF.ViewModel.SubVM
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    class DoliVM : VMBase
     {
+        #region MVVM AREA
+        #region Fields
+        #region Doli outputs
+        private Dictionary<string, double> _doliData;
+        private Double _doliTime;
+        private Double _doliLoad;
+        private Double _doliPosition;
+        private Double _doliExtend;
+        #endregion
+        #region Doli output data
+        private Double _onDataTime;
+        private Double _onDataLoad;
+        private Double _onDataPosition;
+        private Double _onDataExtend;
+        private Double _tareTime;
+        private Double _tareLoad;
+        private Double _tarePosition;
+        private Double _tareExtend;
+        private Double _xMax;
+        private string _display;
+        #endregion
+        #region Doli Setup
+        private string _textDisplay;
+        private double _defaultVel;
+        private double _limLoad;
+        private double _velocity;
+        private double _destination;
+        private DoPE.CTRL _selectedMoveCTRL;
+        #endregion
+        #endregion
+        #region Properties
+        #region Doli outputs
+        //public Dictionary<string,double> DoliData
+        //{
+        //    get => _doliData;
+        //    set 
+        //    { _doliData = value; OnPropertyChanged("DoliData"); }
+        //}
+        public double DoliTime
+        {
+            get => _doliTime;
+            set
+            { _doliTime = value - _tareTime; OnPropertyChanged("DoliTime"); }
+        }
+        public double DoliLoad
+        {
+            get => _doliLoad;
+            set
+            { _doliLoad = value - _tareLoad; OnPropertyChanged("DoliLoad"); }
+        }
+        public double DoliPosition
+        {
+            get => _doliPosition;
+            set
+            { _doliPosition = value - _tarePosition; OnPropertyChanged("DoliPosition"); }
+        }
+        public double DoliExtend
+        {
+            get => _doliExtend;
+            set
+            { _doliExtend = value - _tareExtend; OnPropertyChanged("DoliExtend"); }
+        }
+        #endregion
+        #region Doli output data
+        public double OnDataTime
+        {
+            get => _onDataTime;
+            set
+            { _onDataTime = value - _tareTime; OnPropertyChanged("OnDataTime"); }
+        }
+        public double OnDataLoad
+        {
+            get => _onDataLoad;
+            set
+            { _onDataLoad = value - _tareLoad; OnPropertyChanged("OnDataLoad"); }
+        }
+        public double OnDataPosition
+        {
+            get => _onDataPosition;
+            set
+            { _onDataPosition = value - _tarePosition; OnPropertyChanged("OnDataPosition"); }
+        }
+        public double OnDataExtend
+        {
+            get => _onDataExtend;
+            set
+            { _onDataExtend = value - _tareExtend; OnPropertyChanged("OnDataExtend"); }
+        }
+        public double TareTime
+        {
+            get => _tareTime;
+            set
+            { _tareTime = value; OnPropertyChanged("TareTime"); }
+        }
+        public double TareLoad
+        {
+            get => _tareLoad;
+            set
+            { _tareLoad = value; OnPropertyChanged("TareLoad"); }
+        }
+        public double TarePosition
+        {
+            get => _tarePosition;
+            set
+            { _tarePosition = value; OnPropertyChanged("TarePosition"); }
+        }
+        public double TareExtend
+        {
+            get => _tareExtend;
+            set
+            { _tareExtend = value; OnPropertyChanged("TareExtend"); }
+        }
+        public double XMax
+        {
+            get => _xMax;
+            set
+            { _xMax = value; OnPropertyChanged("XMax"); }
+        }
+        #endregion
+        #region Doli setup
+        public string TextDisplay
+        {
+            get => _textDisplay;
+            set
+            { _textDisplay = value; OnPropertyChanged("TextDisplay"); }
+        }
+        public double DefaultVel
+        {
+            get => _defaultVel;
+            set
+            { _defaultVel = value; OnPropertyChanged("DefaultVel"); }
+        }
+        public double LimLoad
+        {
+            get => _limLoad;
+            set
+            { _limLoad = value; OnPropertyChanged("LimLoad"); }
+        }
+        public double Velocity
+        {
+            get => _velocity;
+            set
+            { _velocity = value; OnPropertyChanged("Velocity"); }
+        }
+        public double Destination
+        {
+            get => _destination;
+            set
+            { _destination = value; OnPropertyChanged("Destination"); }
+        }
+        public DoPE.CTRL SelectedMoveCTRL
+        {
+            get => _selectedMoveCTRL;
+            set
+            { _selectedMoveCTRL = value; OnPropertyChanged("SelectedMoveCTRL"); }
+        }
+
+        #endregion
+        #endregion
+        #endregion
+
         #region INITIALISATION
         private readonly int SensorId = 0; //search through all sensor
 
@@ -54,37 +211,14 @@ namespace DauBe_WTF
         // Loading variables
         public Globals ListData = new Globals();
         //private RealTimeChart NewINstanceOfChart;
-        private MainVM NewINstanceOfChart;
+        private GraphVM NewINstanceOfChart;
         //private RealTimeCharts NewINstanceOfChart2;
         public delegate void update(double time, double position, double load, double extension);
 
-
-        public MainWindow()
+        public DoliVM()
         {
-            InitializeComponent();
-            //NewINstanceOfChart = new RealTimeChartsVM();
-            //Doli code was not written to be easily used using WPF, or MVVM. We need an extra step to bind data fomr the codebehind (here) to the viewmodel.
-            DataContext = new MainVM();
+            _velocity = 179998;
         }
-
-        private void Window_Loaded(object sender, EventArgs e)
-        {
-            //DoPE.CheckApi("Version of DoPENet.dll");
-
-            // show GUI
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
-
-
-            // show DoPE.Ctrl enum members in guiControl combo-box.
-            guiControl.ItemsSource = Enum.GetNames(typeof(DoPE.CTRL));
-
-            // Set the control-combobox to "position".
-            guiControl.SelectedIndex = (int)DoPE.CTRL.POS;
-
-            // Connect to EDC
-            ConnectToEdc();
-        }
-
 
         ///----------------------------------------------------------------------
         /// <summary>Connect to EDC</summary>
@@ -94,8 +228,6 @@ namespace DauBe_WTF
             // tell DoPE which DoPENet.dll and DoPE.dll version we are using
             // THE API CANNOT BE USED WITHOUT THIS CHECK !
             DoPE.CheckApi("2.81");
-
-            Cursor = Cursors.Wait;
 
             try
             {
@@ -156,8 +288,6 @@ namespace DauBe_WTF
                 // error return codes.
                 Display(string.Format("{0}\n", ex));
             }
-
-            Cursor = Cursors.Arrow;
         }
 
         #endregion
@@ -182,7 +312,7 @@ namespace DauBe_WTF
         ///----------------------------------------------------------------------
         private void Display(string Text)
         {
-            //((MainVM)(this.DataContext)).Display += Text;
+            TextDisplay += Text;
             //guiDebug.AppendText(Text);
             //guiDebug.UpdateLayout();
         }
@@ -255,13 +385,13 @@ namespace DauBe_WTF
                     LastTime = Time;
 
                     //il faudrait utiliser une property dependency pour optimiser l'utilisation de la mémoire
-                    ((GraphVM)(this.DataContext)).DoliTime = Sample.Time;
+                    DoliTime = Sample.Time;
 
-                    ((GraphVM)(this.DataContext)).DoliPosition = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S];
+                    DoliPosition = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S];
 
-                    ((GraphVM)(this.DataContext)).DoliLoad = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F];
+                    DoliLoad = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F];
 
-                    ((GraphVM)(this.DataContext)).DoliExtend = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E];
+                    DoliExtend = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E];
                 }
             }
             return 0;
@@ -292,9 +422,9 @@ namespace DauBe_WTF
             Display(string.Format("OnPosMsg: DoPError={0} Reached={1} Time={2} Control={3} Position={4} DControl={5} Destination={6} usTAN={7} \n",
               PosMsg.DoPError, PosMsg.Reached, PosMsg.Time, PosMsg.Control, PosMsg.Position, PosMsg.DControl, PosMsg.Destination, PosMsg.usTAN));
             // get the control mode defined in the dropping menu
-            DoPE.CTRL control = (DoPE.CTRL)guiControl.SelectedIndex;
+            DoPE.CTRL control = SelectedMoveCTRL;
             // if current control mode is position AND the limit load is reached, proc that message
-            if ((control == DoPE.CTRL.POS) & ((Math.Abs(PosMsg.Destination) > Math.Abs(noProblemJeanClaude(limLoad.Text)) * 0.90)))
+            if ((control == DoPE.CTRL.POS) & ((Math.Abs(PosMsg.Destination) > Math.Abs(LimLoad) * 0.90)))
             {
                 MessageBox.Show("ERROR: you exceed 90% of the defined limit load");
             }
@@ -326,7 +456,7 @@ namespace DauBe_WTF
             MessageBox.Show("TU AS MERDE MAURICE, RETOUR A LA VALEUR DE PRESSION LIMITE");
             // The following moves the x-head to lower the load in case the user went to far. SftMsg.Position actually stores the load ...
             resetSft();
-            double endDest = Math.Abs(noProblemJeanClaude(limLoad.Text));
+            double endDest = Math.Abs(LimLoad);
             if (SftMsg.Position < 0.0)
             {
                 Console.WriteLine("negatif = " + -endDest);
@@ -441,8 +571,8 @@ namespace DauBe_WTF
         #region TEST CODE
         private void guiControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            DoPE.CTRL control = (DoPE.CTRL)guiControl.SelectedIndex;
-
+            DoPE.CTRL control = SelectedMoveCTRL;
+            /*
             switch (control)
             {
                 case DoPE.CTRL.POS:
@@ -472,7 +602,7 @@ namespace DauBe_WTF
                     /// reset values to limit missclicks
                     destination.Text = "0";
                     break;
-            }
+            }*/
         }
         private double noProblemJeanClaude(String chiant)
         {
@@ -492,13 +622,13 @@ namespace DauBe_WTF
 
         private void moveUp()
         {
-            double speed = Math.Abs(noProblemJeanClaude(defaultVel.Text));
+            double speed = Math.Abs(DefaultVel);
             Int32 i = MyEdc.DoPEDllHdl;
             DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.UP, DoPE.CTRL.POS, speed, ref MyTan);
 
             //Setup security load
-            double uprLim = Math.Abs(noProblemJeanClaude(limLoad.Text));
-            double lwrLim = -1.0 * Math.Abs(noProblemJeanClaude(limLoad.Text));
+            double uprLim = Math.Abs(LimLoad);
+            double lwrLim = -1.0 * Math.Abs(LimLoad);
             // When pressing up button, only risk is to apply to much tensile load. However in the case the user went to far while applying a
             // pressure load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
             // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
@@ -508,13 +638,13 @@ namespace DauBe_WTF
 
         private void moveDown()
         {
-            double speed = Math.Abs(noProblemJeanClaude(defaultVel.Text));
+            double speed = Math.Abs(DefaultVel);
             Int32 i = MyEdc.DoPEDllHdl;
             DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.DOWN, DoPE.CTRL.POS, speed, ref MyTan);
 
             //Setup security load
-            double uprLim = Math.Abs(noProblemJeanClaude(limLoad.Text));
-            double lwrLim = -1.0 * Math.Abs(noProblemJeanClaude(limLoad.Text));
+            double uprLim = Math.Abs(LimLoad);
+            double lwrLim = -1.0 * Math.Abs(LimLoad);
             // When pressing down button, only risk is to apply to much pressure. However in the case the user went to far while applying a
             // tensile load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
             // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
@@ -532,20 +662,20 @@ namespace DauBe_WTF
         private void resetSft()
         // function used to reset softend for the user to be able to send other command from the window
         {
-            double uprLim = Math.Abs(noProblemJeanClaude(limLoad.Text)) * 5.0;
-            double lwrLim = -1.0 * Math.Abs(noProblemJeanClaude(limLoad.Text)) * 5.0;
+            double uprLim = Math.Abs(LimLoad) * 5.0;
+            double lwrLim = -1.0 * Math.Abs(LimLoad) * 5.0;
             DoPE.ERR error2 = MyEdc.Ctrl.Sft(DoPE.CTRL.LOAD, uprLim, lwrLim, DoPE.REACT.STATUS);
         }
 
         public void moveToDest(DoPE.CTRL controlMove, double destination, double velLim = 1.0, double limit = 0.0, short yourRef = 0, int flag = 0)
         {
             // in case the user did not specify a speed
-            if (velocity.Text == "")
+            if (Velocity == 0)
             {
-                velocity.Text = "1.0";
+                Velocity = 1.0;
             }
-            velLim = noProblemJeanClaude(velocity.Text);
-            limit = -Math.Abs(noProblemJeanClaude(limLoad.Text));
+            velLim = Velocity;
+            limit = -Math.Abs(LimLoad);
             // distinction required, otherwise the X-head only move in one given direction
             if (destination > ListData.OnDataPosition)
             {
@@ -587,9 +717,9 @@ namespace DauBe_WTF
         private void upBut_MouseDown(object sender, MouseEventArgs e)
         {
             // in case the user did not specify a speed
-            if (defaultVel.Text == "")
+            if (DefaultVel == 0)
             {
-                defaultVel.Text = "1.0";
+                DefaultVel = 1.0;
             }
             moveUp();
         }
@@ -602,9 +732,9 @@ namespace DauBe_WTF
         private void downBut_MouseDown(object sender, EventArgs e)
         {
             // in case the user did not specify a speed
-            if (defaultVel.Text == "")
+            if (DefaultVel == 0)
             {
-                defaultVel.Text = "1.0";
+                DefaultVel = 1.0;
             }
             moveDown();
         }
@@ -613,8 +743,8 @@ namespace DauBe_WTF
 
         private void destBut_Click(object sender, EventArgs e)
         {
-            double dest = noProblemJeanClaude(destination.Text);
-            DoPE.CTRL CTRL = (DoPE.CTRL)guiControl.SelectedIndex;
+            double dest = Destination;
+            DoPE.CTRL CTRL = SelectedMoveCTRL;
             moveToDest(CTRL, dest);
         }
 
@@ -674,7 +804,9 @@ namespace DauBe_WTF
 
         }
 
-    
+
+
     }
 }
+
 
