@@ -21,6 +21,10 @@ namespace DauBe_WTF.ViewModel.SubVM
 {
     class DoliVM : VMBase
     {
+        #region Private Field with no Property
+        #region AutoPos
+        #endregion
+        #endregion
         #region MVVM AREA
         #region Fields
         #region Doli outputs
@@ -43,6 +47,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         private string _display;
         #endregion
         #region Doli Setup
+        private DoPE.ERR _error;
         private string _textDisplay;
         private double _defaultVel;
         private double _limLoad;
@@ -50,6 +55,10 @@ namespace DauBe_WTF.ViewModel.SubVM
         private double _destination;
         private DoPE.CTRL _selectedMoveCTRL;
         private bool _isDoliOn;
+        #endregion
+        #region DoliCTRL
+        private DoPE.CTRL _manualCTRL;
+        private double _manualDestination;
         #endregion
         #endregion
         #region Properties
@@ -142,6 +151,12 @@ namespace DauBe_WTF.ViewModel.SubVM
         }
         #endregion
         #region Doli setup
+        public DoPE.ERR Error
+        {
+            get => _error;
+            set
+            { _error = value; OnPropertyChanged("Error"); }
+        }
         public bool IsDoliOn
         {
             get => _isDoliOn;
@@ -186,10 +201,28 @@ namespace DauBe_WTF.ViewModel.SubVM
         }
 
         #endregion
+        #region DoliCTRL
+        public DoPE.CTRL ManualCTRL
+        {
+            get => _manualCTRL;
+            set
+            { _manualCTRL = value; OnPropertyChanged("ManualCTRL"); }
+        }
+        public double ManualDestination
+        {
+            get => _manualDestination;
+            set
+            { _manualDestination = value; OnPropertyChanged("ManualDestination"); }
+        }
+        #endregion
+        #endregion
+        #region "Static" values
+        public string[] DoPEItems { get; set; }
         #endregion
         #region Commands
         public ICommand DoliOnCommand { get; set; }
         public ICommand DoliOffCommand { get; set; }
+        public ICommand DoliGoCommand { get; set; }
         #endregion
         #endregion
 
@@ -235,11 +268,15 @@ namespace DauBe_WTF.ViewModel.SubVM
         #region Private methods
         private void Initialisation()
         {
+            //Interface parameters
+            DoPEItems = Enum.GetNames(typeof(DoPE.CTRL));
             //Doli param
             _isDoliOn = false;
             //Commands ini
             DoliOnCommand = new RelayCommand(o => DoliOn(), o => { return !_isDoliOn; });
             DoliOffCommand = new RelayCommand(o => DoliOff(), o => { return _isDoliOn; });
+            DoliGoCommand = new RelayCommand(o => DoliGo(), o => { return (ManualDestination != 0 ); });
+            //AutoPosCommand = new RelayCommand();
         }
         #endregion  
         ///----------------------------------------------------------------------
@@ -770,12 +807,70 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         #endregion
 
-        private void destBut_Click(object sender, EventArgs e)
+        private void DoliGo()
         {
             double dest = Destination;
             DoPE.CTRL CTRL = SelectedMoveCTRL;
             moveToDest(CTRL, dest);
         }
+
+        public async Task AsyncAutoPosApproach()
+        {
+            double velLim = 100; //Deplacement de la X-head à 100 mm/s
+            double lim = -100; //Limite de position (mm) qui ne sera jamais atteinte, mais demandée par PosExt
+            double destination = -1000; //Destination visée par la Xhead -1000N (compression)
+            //On déplace le piston à 100mm/s jusqu'à ce qu'une force de -1000N soit enregistrée (ou que sa position soit arrivée à -100 mm)
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, lim, DoPE.DESTMODE.APPROACH, ref MyTan);
+            await Task.Run(() =>
+            {
+                while (Math.Abs(DoliLoad) < Math.Abs(lim) * 0.8)
+                {
+                    System.Threading.Thread.Sleep(250);
+                }
+            });
+        }
+
+        public async Task AsyncAutoPosBallRelease()
+        {
+            double offset = 20.0; // offset permettant de remonter la Xhead de 20mm
+            double lim = 150; 
+            double destination = DoliPosition + offset;
+            double velLim = 100;
+            //On remonte simplement le piston de 20mm
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, lim, DoPE.DESTMODE.APPROACH, ref MyTan);
+            await Task.Run(() =>
+            {
+                while (Math.Abs(Math.Abs(DoliPosition) - Math.Abs(destination)) > 0.2)
+                {
+                    System.Threading.Thread.Sleep(250);
+                }
+            });
+        }
+
+        public async Task AsyncAutoPosFinal(double Progression)
+        {
+            double squishedBall = 25;
+            double lim = -100;
+            double destination = DoliPosition - squishedBall;
+            double velLim = 5;
+            Progression = 0;
+            // On replace le piston à sa place basse
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, lim, DoPE.DESTMODE.APPROACH, ref MyTan);
+            await Task.Run(() =>
+            {
+                while (Math.Round(DoliPosition,2) != Math.Round(destination,2))
+                {
+                    Progression = Math.Round((1 - (Math.Abs(Math.Abs(DoliPosition - destination)) / squishedBall) * 100),1);
+                    System.Threading.Thread.Sleep(25);
+                }
+            });
+        }
+
+        public async Task pouetpouet()
+        {
+            await Task.Delay(2000);
+        }
+
 
         private void btnRecord_Click(object sender, EventArgs e)
         {
@@ -804,8 +899,8 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         private void btnPos_Click(object sender, EventArgs e)
         {
-            var calibration = new Calibration(MyEdc, MyTan, ListData);
-            calibration.Show();
+            //var calibration = new Calibration(MyEdc, MyTan, ListData);
+            //calibration.Show();
         }
 
         private void btnGraph_Click(object sender, RoutedEventArgs e)

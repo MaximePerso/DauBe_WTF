@@ -6,33 +6,22 @@
         xmlns:local="clr-namespace:DauBe_WTF"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         xmlns:main="clr-namespace:DauBe_WTF.ViewModel"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:converter="clr-namespace:DauBe_WTF.Converters"
+        xmlns:uc="clr-namespace:InteractiveGraphUserControl;assembly=InteractiveGraphUserControl"
         xmlns:subvm="clr-namespace:DauBe_WTF.ViewModel.SubVM"
         mc:Ignorable="d"
         Title="MainWindow" Height="1261" Width="1735" Loaded="Window_Loaded">
-    
+
     <!--d:DataContext="{d:DesignData Type=local:RealTimeChartsVM, IsDesignTimeCreatable=False}">-->
     <Window.DataContext>
         <main:MainVM/>
     </Window.DataContext>
     <Window.Resources>
-        <collections:ArrayList x:Key="colors">
-            <Color>DodgerBlue</Color>
-            <Color>Red</Color>
-            <Color>Green</Color>
-        </collections:ArrayList>
-
-        <collections:ArrayList x:Key="brushes">
-            <SolidColorBrush Color="Transparent"></SolidColorBrush>
-            <SolidColorBrush Color="#861E90FF"></SolidColorBrush>
-            <LinearGradientBrush>
-                <GradientStop Offset="0" Color="#86FF0000" />
-                <GradientStop Offset="1" Color="#80FFFF00" />
-            </LinearGradientBrush>
-        </collections:ArrayList>
-
         <subvm:DoliVM x:Key="doli"/>
         <subvm:GraphVM x:Key="graph"/>
+        <main:MainVM x:Key="mainVM"/>
+        <converter:CTRLToUnitStringConverter x:Key="CTRLToUnit"/>
+        <converter:CTRLToDestUnitStringConverter x:Key="CTRLToDestUnit"/>
     </Window.Resources>
 
     <Grid x:Name="mainGrid" RenderTransformOrigin="0.697,0.415">
@@ -83,37 +72,79 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="0" Grid.Column="1" DataContext="{StaticResource doli}">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Vertical" >
-                    <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" Height="Auto"/>
-                </StackPanel>
-                <StackPanel Orientation="Vertical" Width="120" HorizontalAlignment="Left">
-                    <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Center" VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
-                        <Button.Background>
-                            <ImageBrush ImageSource="Pictures/arrow.png" Stretch="Uniform"/>
-                        </Button.Background>
-                    </Button>
-                    <StackPanel>
-                    <Label Content="Velocity" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                        
-                    </StackPanel>
-                    <TextBox x:Name="defaultVel" HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Velocity}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
+            <TabControl HorizontalAlignment="Stretch" Height="Auto" Margin="0,10" VerticalAlignment="Stretch" Width="Auto" TabStripPlacement="Right" BorderThickness="0">
+                <TabItem Header="Manual" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
+                    <Grid MinWidth="400" Margin="100,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="9*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Grid.ColumnSpan="3">
+                                <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" Height="Auto"/>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="0">
+                            <StackPanel VerticalAlignment="Center">
+                                <Label Content="Move CTRL" HorizontalAlignment="Center"/>
+                                <ComboBox ItemsSource="{Binding DoPEItems}" SelectedValue="{Binding ManualCTRL, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Width="120"/>
+                                <Label Content="{Binding ManualCTRL, Converter={StaticResource CTRLToUnit}}" HorizontalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Velocity}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                            <StackPanel Orientation="Vertical" Width="120" HorizontalAlignment="Center" >
+                                <Button Content="Up" HorizontalAlignment="Center" VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
+                                    <Button.Background>
+                                        <ImageBrush ImageSource="Pictures/arrow.png" Stretch="Uniform"/>
+                                    </Button.Background>
+                                </Button>
+                                <Button Content="Down" HorizontalAlignment="Center"  VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
+                                    <Button.Background>
+                                        <ImageBrush ImageSource="Pictures/arrow.png" Stretch="Uniform">
+                                            <ImageBrush.RelativeTransform>
+                                                <RotateTransform CenterX="0.5" CenterY="0.5" Angle="180"/>
+                                            </ImageBrush.RelativeTransform>
+                                        </ImageBrush>
+                                    </Button.Background>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="2">
+                            <StackPanel VerticalAlignment="Center">
+                                <Label Content="{Binding ManualCTRL, Converter={StaticResource CTRLToDestUnit}}" HorizontalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding ManualDestination, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
+                                <Separator Margin="30" Width="0"/>
+                                <Button Content="Go" Command="{Binding DoliGoCommand}" Width="120" Height="40"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Single CTRL" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
+                    <Grid >
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Automatic" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
+                    <Grid HorizontalAlignment="Center" DataContext="{StaticResource mainVM}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Command="{Binding AutoPosCommand}" Content="Auto Positionning" Width="150" Height="100"/>
+                            <Separator Margin="20" Width="0"/>
+                            <Button Command="{Binding InputListCommand}" Content="Input List" Width="150" Height="100"/>
+                            <Separator Margin="20" Width="0"/>
+                            <Button Command="{Binding CyclesCommand}" Content="Cycles" Width="150" Height="100"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+            </TabControl>
 
-                    <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Center"  VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
-                        <Button.Background>
-                            <ImageBrush ImageSource="Pictures/arrow.png" Stretch="Uniform">
-                                <ImageBrush.RelativeTransform>
-                                    <RotateTransform CenterX="0.5" CenterY="0.5" Angle="180"/>
-                                </ImageBrush.RelativeTransform>
-                            </ImageBrush>
-                        </Button.Background>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
+
         </Grid>
         <Grid Margin="10,0,0,0" Grid.Row="0" Grid.ColumnSpan="2" DataContext="{StaticResource doli}">
             <Label x:Name="lblDestination" Content="" HorizontalAlignment="Left" Margin="272,379,0,0" VerticalAlignment="Top" Height="19" Width="10"/>
-            <TabControl HorizontalAlignment="Left" Height="234" Margin="933,136,0,0" VerticalAlignment="Top" Width="774">
+            <TabControl HorizontalAlignment="Left" Height="234" Margin="10,100036,0,0" VerticalAlignment="Top" Width="774">
                 <TabItem x:Name="controlTab" Header="Control">
                     <Grid Background="#FFE5E5E5">
                         <Grid.ColumnDefinitions>
@@ -130,12 +161,12 @@
                     </Grid>
                 </TabItem>
                 <TabItem x:Name="setupTab" Header="Setup">
-                    <Grid Background="#FFE5E5E5">
+                    <!--<Grid Background="#FFE5E5E5">
                         <Button x:Name="btnGraph" Content="Graph" HorizontalAlignment="Left" Margin="194,64,0,0" VerticalAlignment="Top" Width="74" Click="btnGraph_Click"/>
                         <Button x:Name="btnPosCal" Content="Position calibration" HorizontalAlignment="Left" Margin="194,104,0,0" VerticalAlignment="Top" Width="74" RenderTransformOrigin="7.28,0.45"/>
                         <TextBox x:Name="defVel" HorizontalAlignment="Left" Height="23" Margin="24,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
                         <TextBox x:Name="limLoad" HorizontalAlignment="Left" Height="23" Margin="24,104,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-                    </Grid>
+                    </Grid>-->
                 </TabItem>
             </TabControl>
         </Grid>

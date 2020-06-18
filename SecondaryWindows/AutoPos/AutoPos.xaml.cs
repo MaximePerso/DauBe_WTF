@@ -13,12 +13,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Doli.DoPE;
 
-namespace DauBe_WTF
+namespace DauBe_WTF.SecondaryWindows.AutoPos
 {
     /// <summary>
     /// Interaction logic for Calibration.xaml
     /// </summary>
-    public partial class Calibration : Window
+    public partial class AutoPos : Window
     {
         // offset is here to make sure all the code is updated when changing this value, especially when the part assumes its position
         private double offsett = 20.0;
@@ -30,9 +30,17 @@ namespace DauBe_WTF
         private Globals measures;
         public Edc MyEdc;
 
-        public Calibration(Edc edc, short myTan, Globals measures)
+        public AutoPos()
         {
             InitializeComponent();
+            this.DataContext = new AutoPosVM();
+        }
+
+        #region TBC
+        public AutoPos(Edc edc, short myTan, Globals measures)
+        {
+            InitializeComponent();
+            this.DataContext = new AutoPosVM();
             MyEdc = edc;
             MyTan = myTan;
             this.measures = measures;
@@ -117,5 +125,6 @@ namespace DauBe_WTF
                 }
             }
         }
+        #endregion
     }
 }

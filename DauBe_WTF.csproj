@@ -60,8 +60,14 @@
     <Reference Include="DoPENet">
       <HintPath>..\DauBENet\DoPENet.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+    <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466, processorArchitecture=MSIL">
+      <HintPath>packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="GoodCircularProgressBar">
+      <HintPath>..\GoodCircularProgressBar\bin\Debug\GoodCircularProgressBar.dll</HintPath>
+    </Reference>
+    <Reference Include="InteractiveGraphUserControl">
+      <HintPath>..\InteractiveGraphUserControl\bin\Debug\InteractiveGraphUserControl.dll</HintPath>
     </Reference>
     <Reference Include="RealTimeGraphX">
       <HintPath>Ressources\RealTimeGraphX-master\RealTimeGraphX\bin\Debug\netstandard2.0\RealTimeGraphX.dll</HintPath>
@@ -73,9 +79,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -94,13 +97,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CircularProgressBar\CircularProgressBar.cs" />
+    <Compile Include="CircularProgressBar\Converters.cs" />
+    <Compile Include="CircularProgressBar\CPBVM.cs" />
+    <Compile Include="Converters\CTRLToDestUnitStringConverter.cs" />
+    <Compile Include="Converters\CTRLToUnitStringConverter.cs" />
+    <Compile Include="SecondaryWindows\AutoPos\AutoPosVM.cs" />
+    <Compile Include="Utility\AsyncCommand.cs" />
+    <Compile Include="Utility\NotifyTaskCompletion.cs" />
     <Compile Include="ViewModel\SubVM\DoliVM.cs" />
     <Compile Include="ViewModel\SubVM\GraphVM.cs" />
     <Compile Include="ViewModel\MainVM.cs" />
     <Compile Include="Utility\RelayCommand.cs" />
     <Compile Include="Utility\VMBase.cs" />
     <Compile Include="WpfGraphControl.cs" />
-    <Page Include="Calibration.xaml">
+    <Page Include="CircularProgressBar\styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SecondaryWindows\AutoPos\AutoPos.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -116,8 +131,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Calibration.xaml.cs">
-      <DependentUpon>Calibration.xaml</DependentUpon>
+    <Compile Include="SecondaryWindows\AutoPos\AutoPos.xaml.cs">
+      <DependentUpon>AutoPos.xaml</DependentUpon>
     </Compile>
     <Compile Include="Emergency.xaml.cs">
       <DependentUpon>Emergency.xaml</DependentUpon>

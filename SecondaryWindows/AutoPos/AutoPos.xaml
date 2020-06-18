@@ -1,0 +1,79 @@
+﻿<Window x:Class="DauBe_WTF.SecondaryWindows.AutoPos.AutoPos"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DauBe_WTF.SecondaryWindows.AutoPos"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:cpb="clr-namespace:DauBe_WTF.CircularProgressBar"
+        xmlns:main="clr-namespace:DauBe_WTF.ViewModel"
+        mc:Ignorable="d"
+        Title="Calibration" Height="359.345" Width="642.718">
+    <Window.Resources>
+        <ResourceDictionary>
+            <cpb:CPBVM x:Key="cpbvm"/>
+            <local:AutoPosVM x:Key="autoPos"/>
+            <main:MainVM x:Key="mainvm"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CircularProgressBar/styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="4*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Label Content="Instructions" FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+        </Grid>
+        <Grid Grid.Row="1" DataContext="{StaticResource autoPos}">
+            <StackPanel Orientation="Vertical">
+                <Label Content="{Binding Instructions}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="60"/>
+                <Button Content="Ok" DataContext="{StaticResource mainvm}" Command="{Binding OkCommand}" Width="120" Height="20"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Label Content="Process state" FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+        </Grid>
+        <Grid Grid.Row="3">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Vertical">
+                    <Label Content="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" FontWeight="Bold" Foreground="{Binding Step1Foreground}" />
+                    <Label Content="Initialisation" Foreground="{Binding Step1Foreground}"/>
+                </StackPanel>
+                <Separator Margin="10" Width="0"/>
+                <Grid>
+                    <fa:ImageAwesome Icon="LongArrowRight" Foreground="{Binding Step1Foreground}" Height="30" Width="100" HorizontalAlignment="Center" Opacity="{Binding ArrowOpacity1}"/>
+                    <fa:ImageAwesome Icon="Spinner" Foreground="Orange" Spin="True" SpinDuration="10" Width="60" HorizontalAlignment="Center" Opacity="{Binding Loading1Opacity}"/>
+                </Grid>
+                <Separator Margin="10" Width="0"/>
+                <StackPanel Orientation="Vertical">
+                    <Label Content="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" FontWeight="Bold" Foreground="{Binding Step2Foreground}"  Opacity="{Binding Opacity2}" />
+                    <Label Content="Approach" Foreground="{Binding Step2Foreground}" Opacity="{Binding Opacity2}"/>
+                </StackPanel>
+                <Separator Margin="10" Width="0"/>
+                <Grid DataContext="{StaticResource cpbvm}">
+                    <fa:ImageAwesome DataContext="{StaticResource autoPos}" Icon="LongArrowRight" Foreground="{Binding Step2Foreground}" Height="30" Width="100" HorizontalAlignment="Center" Opacity="{Binding ArrowOpacity2}"/>
+                    <cpb:CircularProgressBar Grid.Row="2" Thickness="10" Radius="50" Value="{Binding ProgressValue}" Style="{StaticResource CircularProgressBarStyle}" 
+                                             Background="Red" Fill="AntiqueWhite" Stroke="Orange" StrokeThickness="10" StrokeMode="Middle" EndLineCap="Round" Opacity="{Binding Loading2Opacity}" />
+                    <!--<pg:GCPB Ras="60"/>-->
+                    <!--<pg:Cpb Height="90" Width="90" VerticalAlignment="Center" HorizontalAlignment="Center" PathStrokeThickness="15" ProgressValue="{Binding CpbValue}"/>-->
+                </Grid>
+                <Separator Margin="10" Width="0"/>
+                <StackPanel Orientation="Vertical">
+                    <fa:ImageAwesome Icon="CheckCircle" Height="90" Width="60" Foreground="{Binding Step3Foreground}" Opacity="{Binding Opacity3}"/>
+                    <Label Content="Done !" HorizontalContentAlignment="Center" Foreground="{Binding Step3Foreground}" Opacity="{Binding Opacity3}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Button x:Name="btnBall" Content="OK" HorizontalAlignment="Left" Margin="437,69,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="btnRemoveBall" Content="OK" HorizontalAlignment="Left" Margin="437,100,0,0" VerticalAlignment="Top" Width="75" Visibility="Hidden"/>
+        <Label Content="Veuillez mettre la balle en caoutchouc en place, puis cliquez sur OK" HorizontalAlignment="Left" Margin="67,66,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblRemoveBall" Content="." HorizontalAlignment="Left" Margin="67,128,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="load" Content="." HorizontalAlignment="Left" Margin="67,97,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
