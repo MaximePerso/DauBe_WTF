@@ -19,12 +19,13 @@ using System.Windows.Threading;
 
 namespace DauBe_WTF.ViewModel.SubVM
 {
-    class DoliVM : VMBase
+    public class DoliVM : VMBase
     {
         #region Private Field with no Property
         #region AutoPos
         #endregion
         #endregion
+
         #region MVVM AREA
         #region Fields
         #region Doli outputs
@@ -55,6 +56,9 @@ namespace DauBe_WTF.ViewModel.SubVM
         private double _destination;
         private DoPE.CTRL _selectedMoveCTRL;
         private bool _isDoliOn;
+        private double _tempDestination;
+        private double _tempLim;
+        private double _squishedBall;
         #endregion
         #region DoliCTRL
         private DoPE.CTRL _manualCTRL;
@@ -199,7 +203,23 @@ namespace DauBe_WTF.ViewModel.SubVM
             set
             { _selectedMoveCTRL = value; OnPropertyChanged("SelectedMoveCTRL"); }
         }
-
+        public double TempDestination
+        {
+            get => _tempDestination;
+            set
+            { _tempDestination = value; OnPropertyChanged("TempDestination"); }
+        }
+        public double TempLim
+        {
+            get => _tempLim;
+            set
+            { _tempLim = value; OnPropertyChanged("TempLim"); }
+        }
+        public double SquishedBall
+        {
+            get => _squishedBall;
+            set { _squishedBall = value; OnPropertyChanged("SquishedBall"); }
+        }
         #endregion
         #region DoliCTRL
         public DoPE.CTRL ManualCTRL
@@ -272,6 +292,7 @@ namespace DauBe_WTF.ViewModel.SubVM
             DoPEItems = Enum.GetNames(typeof(DoPE.CTRL));
             //Doli param
             _isDoliOn = false;
+            _squishedBall = 25;
             //Commands ini
             DoliOnCommand = new RelayCommand(o => DoliOn(), o => { return !_isDoliOn; });
             DoliOffCommand = new RelayCommand(o => DoliOff(), o => { return _isDoliOn; });
@@ -813,64 +834,33 @@ namespace DauBe_WTF.ViewModel.SubVM
             DoPE.CTRL CTRL = SelectedMoveCTRL;
             moveToDest(CTRL, dest);
         }
-
-        public async Task AsyncAutoPosApproach()
+        public void AutoPosApproach()
         {
             double velLim = 100; //Deplacement de la X-head à 100 mm/s
-            double lim = -100; //Limite de position (mm) qui ne sera jamais atteinte, mais demandée par PosExt
-            double destination = -1000; //Destination visée par la Xhead -1000N (compression)
+            _tempLim = -100; //Limite de position (mm) qui ne sera jamais atteinte, mais demandée par PosExt
+            _tempDestination = -1000; //Destination visée par la Xhead -1000N (compression)
             //On déplace le piston à 100mm/s jusqu'à ce qu'une force de -1000N soit enregistrée (ou que sa position soit arrivée à -100 mm)
-            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, lim, DoPE.DESTMODE.APPROACH, ref MyTan);
-            await Task.Run(() =>
-            {
-                while (Math.Abs(DoliLoad) < Math.Abs(lim) * 0.8)
-                {
-                    System.Threading.Thread.Sleep(250);
-                }
-            });
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
         }
 
-        public async Task AsyncAutoPosBallRelease()
+        public void AutoPosBallRelease()
         {
             double offset = 20.0; // offset permettant de remonter la Xhead de 20mm
-            double lim = 150; 
-            double destination = DoliPosition + offset;
+            _tempLim = 150;
+            _tempDestination = DoliPosition + offset;
             double velLim = 100;
             //On remonte simplement le piston de 20mm
-            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, lim, DoPE.DESTMODE.APPROACH, ref MyTan);
-            await Task.Run(() =>
-            {
-                while (Math.Abs(Math.Abs(DoliPosition) - Math.Abs(destination)) > 0.2)
-                {
-                    System.Threading.Thread.Sleep(250);
-                }
-            });
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
         }
 
-        public async Task AsyncAutoPosFinal(double Progression)
+        public void AutoPosFinal()
         {
-            double squishedBall = 25;
-            double lim = -100;
-            double destination = DoliPosition - squishedBall;
+            _tempLim = -100;
+            _tempDestination = DoliPosition - _squishedBall;
             double velLim = 5;
-            Progression = 0;
             // On replace le piston à sa place basse
-            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, lim, DoPE.DESTMODE.APPROACH, ref MyTan);
-            await Task.Run(() =>
-            {
-                while (Math.Round(DoliPosition,2) != Math.Round(destination,2))
-                {
-                    Progression = Math.Round((1 - (Math.Abs(Math.Abs(DoliPosition - destination)) / squishedBall) * 100),1);
-                    System.Threading.Thread.Sleep(25);
-                }
-            });
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
         }
-
-        public async Task pouetpouet()
-        {
-            await Task.Delay(2000);
-        }
-
 
         private void btnRecord_Click(object sender, EventArgs e)
         {

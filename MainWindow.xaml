@@ -85,7 +85,7 @@
                             <RowDefinition Height="9*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0" Grid.ColumnSpan="3">
-                                <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" Height="Auto"/>
+                                <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" MinHeight="40"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="0">
                             <StackPanel VerticalAlignment="Center">

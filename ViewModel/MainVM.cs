@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace DauBe_WTF.ViewModel
 {
-    class MainVM : VMBase
+    public class MainVM : VMBase
     {
         #region Sub VM Fields
         private InteractiveGraphUserControl.MVVM.ViewModel _ucVM;
@@ -48,6 +48,7 @@ namespace DauBe_WTF.ViewModel
         #endregion 
         #region Commands
         public ICommand AutoPosCommand { get; set; }
+        public ICommand InputListCommand { get; set; }
         public IAsyncCommand OkCommand { get; set; }
         #endregion
         public IView view;
@@ -57,63 +58,21 @@ namespace DauBe_WTF.ViewModel
             //Gridgraph usercontrol
             UCVM = new InteractiveGraphUserControl.MVVM.ViewModel(view);
             //Auto positioning windows
-            autopos = new SecondaryWindows.AutoPos.AutoPosVM();
-            AutoPosCommand = new RelayCommand(o => FireAutoPosWin(), o => true);
-            OkCommand = new AsyncCommand(NextAction,CheckBusiness);
+            autopos = new SecondaryWindows.AutoPos.AutoPosVM(pg,doli);
+            AutoPosCommand = new RelayCommand(o => FireAutoPosWin());
+            InputListCommand = new RelayCommand(o => InputListWin());
         }
 
         private void FireAutoPosWin()
         {
-            //initialisation
-            pg.ProgressValue = 1;
-
             var autoPosWin = new SecondaryWindows.AutoPos.AutoPos();
             autoPosWin.Show();
         }
 
-        private async Task NextAction()
+        private void FireInputListWin()
         {
-            try
-            {
-                IsDoliBusy = true;
-                if (autopos.IsBallOn == false)
-                {
-                    autopos.IsBallOn = true;
-                    autopos.Loading1Opacity = 1;
-                    autopos.Step1Foreground = Brushes.Green;
-                    //await doli.AsyncAutoPosApproach();
-                    //await doli.AsyncAutoPosBallRelease();
-                    await doli.pouetpouet();
-                    autopos.Instructions = "Veuillez enlever la balle en caoutchouc";
-                    autopos.ArrowOpacity1 = 1;
-                    autopos.Loading1Opacity = 0;
-                    autopos.Step2Foreground = Brushes.Orange;
-                    autopos.Opacity2 = 1;
-                }
-                else
-                {
-                    autopos.IsBallOff = true;
-                    await doli.pouetpouet();
-                    autopos.Step2Foreground = Brushes.Green;
-                    autopos.Step3Foreground = Brushes.Orange;
-                    pg.Loading2Opacity = 1;
-                    //await doli.AsyncAutoPosFinal(pg.ProgressValue);
-                    autopos.Instructions = "Le piston est en place !";
-                    autopos.Step3Foreground = Brushes.Green;
-                    pg.Loading2Opacity = 0;
-                    autopos.ArrowOpacity2 = 1;
-                    autopos.Opacity2 = 1;
-                }
-            }
-            finally
-            {
-                IsDoliBusy = false;
-            }
-        }
-
-        private bool CheckBusiness()
-        {
-            return !IsDoliBusy;
+            var inputListWin = new SecondaryWindows.InputList.InputLitst();
+            inputListWin.Show();
         }
     }
 }

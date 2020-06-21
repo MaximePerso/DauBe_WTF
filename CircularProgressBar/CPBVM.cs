@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using GoodCircularProgressBar.mvvmSupport;
 
 namespace DauBe_WTF.CircularProgressBar
 {
@@ -19,8 +18,10 @@ namespace DauBe_WTF.CircularProgressBar
             set
             { _loading2Opacity = value; OnPropertyChanged("Loading2Opacity"); }
         }
-        private int _progressValue;
-        public int ProgressValue
+
+
+        private double _progressValue;
+        public double ProgressValue
         {
             get { return _progressValue; }
             set

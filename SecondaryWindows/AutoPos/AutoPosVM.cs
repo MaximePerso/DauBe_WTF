@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using DauBe_WTF.CircularProgressBar;
+using GS = GalaSoft.MvvmLight.CommandWpf;
+using System.Threading;
+using System.Windows;
 
 namespace DauBe_WTF.SecondaryWindows.AutoPos
 {
-    class AutoPosVM : VMBase
+    public class AutoPosVM : VMBase
     {
 
         #region Fields
@@ -25,9 +28,12 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
         private double _loading1Opacity;
         private bool _isBallOn;
         private bool _isBallOff;
+        private bool _isBusy;
         #endregion
 
         #region Properties
+        private CircularProgressBar.CPBVM _pg { get; }
+        private ViewModel.SubVM.DoliVM _doli { get; }
         public string Instructions
         {
             get => _instructions;
@@ -94,6 +100,12 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
             set
             { _isBallOff = value; OnPropertyChanged("IsBallOff"); }
         }
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set
+            { _isBusy = value; OnPropertyChanged("IsBusy"); }
+        }
         #endregion
 
         #region Command
@@ -101,9 +113,13 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
         #endregion
 
         #region Contructor
-        public AutoPosVM()
+        public AutoPosVM() { }
+        public AutoPosVM(CPBVM pg, ViewModel.SubVM.DoliVM doli)
         {
             Initialisation();
+            _doli = doli;
+            _pg = pg;
+            OkCommand = new RelayCommand(o => { Console.WriteLine(Opacity3); });
         }
         #endregion
 
@@ -111,20 +127,133 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
         private void Initialisation()
         {
             //property initialisation
-            _step1Foreground = Brushes.Orange;
-            _step2Foreground = Brushes.Red;
-            _step3Foreground = Brushes.Red;
-            _opacity2 = 0.2;
-            _opacity3 = 0.2;
-            _arrowOpacity1 = 0.2;
-            _arrowOpacity2 = 0.2;
-            _loading1Opacity = 0.0;
-            _instructions = "Mettre la balle en caoutchouc en place";
-            _isBallOn = false;
-            _isBallOff = false;
+            Step1Foreground = Brushes.Orange;
+            Step2Foreground = Brushes.Red;
+            Step3Foreground = Brushes.Red;
+            Opacity2 = 0.2;
+            Opacity3 = 0.2;
+            ArrowOpacity1 = 0.2;
+            ArrowOpacity2 = 0.2;
+            Loading1Opacity = 0.0;
+            Instructions = "Mettre la balle en caoutchouc en place";
+            IsBallOn = false;
+            IsBallOff = false;
         }
 
-        
+        private GS.RelayCommand _autoPosCycle;
+        public GS.RelayCommand AutoPosCycle
+        {
+            get
+            {
+                return _autoPosCycle
+                        ?? (_autoPosCycle = new GS.RelayCommand(
+                            async () =>
+                            {
+                                IsBusy = true;
+                                if (IsBallOn == true && IsBallOff == true)
+                                {
+                                    MessageBox.Show("Hophophop Maurice, qu'est-ce que tu crois que tu vas faire la ? On reprend");
+                                    Initialisation();
+                                    IsBusy = false;
+                                    _autoPosCycle.RaiseCanExecuteChanged();
+                                }
+                                else if (IsBallOn == false)
+                                {
+                                    IsBallOn = true;
+                                    Loading1Opacity = 1;
+                                    Step1Foreground = Brushes.Green;
+                                    await pouetpouet();
+                                    //await AsyncAutoPosApproach();
+                                    //await AsyncAutoPosBallRelease();
+                                    Instructions = "Veuillez enlever la balle en caoutchouc";
+                                    ArrowOpacity1 = 1;
+                                    Loading1Opacity = 0;
+                                    Step2Foreground = Brushes.Orange;
+                                    Opacity2 = 1;
+                                    IsBusy = false;
+                                    //on libère le bouton
+                                    _autoPosCycle.RaiseCanExecuteChanged();
+                                }
+                                else
+                                {
+                                    IsBallOff = true;
+                                    Step2Foreground = Brushes.Green;
+                                    Step3Foreground = Brushes.Orange;
+                                    _pg.Loading2Opacity = 1;
+                                    await pouetpouet();
+                                    //await AsyncAutoPosFinal();
+                                    Instructions = "Le piston est en place !";
+                                    Step3Foreground = Brushes.Green;
+                                    _pg.Loading2Opacity = 0;
+                                    ArrowOpacity2 = 1;
+                                    Opacity3 = 1;
+                                    IsBusy = false;
+                                    //on libère le bouton
+                                    _autoPosCycle.RaiseCanExecuteChanged();
+                                }
+                            }, () => { return !IsBusy; }, false));
+            }
+        }
+
+        public async Task pouetpouet()
+        {
+            await Task.Run(() =>
+            {
+                int i = 0;
+                while (i < 101)
+                {
+                    _pg.ProgressValue = i;
+                    Thread.Sleep(20);
+                    i++;
+                }
+                _pg.ProgressValue = 0;
+            });
+        }
+
+        public async Task AsyncInitialisation()
+        {
+            await Task.Run(() =>
+            {
+                Initialisation();
+            });
+        }
+
+        public async Task AsyncAutoPosFinal()
+        {
+            _pg.ProgressValue = 0;
+            // On replace le piston à sa place basse
+            await Task.Run(() =>
+            {
+                while (Math.Round(_doli.DoliPosition, 2) != Math.Round(_doli.TempDestination, 2))
+                {
+                    _pg.ProgressValue = Math.Round((1 - (Math.Abs(Math.Abs(_doli.DoliPosition - _doli.TempDestination)) / _doli.SquishedBall) * 100), 1);
+                    System.Threading.Thread.Sleep(25);
+                }
+            });
+        }
+
+        public async Task AsyncAutoPosApproach()
+        {
+            await Task.Run(() =>
+            {
+                while (Math.Abs(_doli.DoliLoad) < Math.Abs(_doli.TempLim) * 0.8)
+                {
+                    System.Threading.Thread.Sleep(250);
+                }
+            });
+        }
+
+        public async Task AsyncAutoPosBallRelease()
+        {
+            await Task.Run(() =>
+            {
+                while (Math.Abs(Math.Abs(_doli.DoliPosition) - Math.Abs(_doli.TempDestination)) > 0.2)
+                {
+                    System.Threading.Thread.Sleep(250);
+                }
+            });
+        }
+
         #endregion
     }
 }
