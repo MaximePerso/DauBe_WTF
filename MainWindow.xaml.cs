@@ -81,7 +81,7 @@ namespace DauBe_WTF
             // Set the control-combobox to "position".
             guiControl.SelectedIndex = (int)DoPE.CTRL.POS;
 
-            ((DauBe_WTF.ViewModel.MainVM)DataContext).doli.ConnectToEdc();
+            ((DauBe_WTF.ViewModel.MainVM)DataContext).Doli.ConnectToEdc();
             // Connect to EDC
             //ConnectToEdc();
         }

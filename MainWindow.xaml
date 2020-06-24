@@ -6,22 +6,25 @@
         xmlns:local="clr-namespace:DauBe_WTF"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         xmlns:main="clr-namespace:DauBe_WTF.ViewModel"
+        xmlns:utility="clr-namespace:DauBe_WTF.Utility"
         xmlns:converter="clr-namespace:DauBe_WTF.Converters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:uc="clr-namespace:InteractiveGraphUserControl;assembly=InteractiveGraphUserControl"
         xmlns:subvm="clr-namespace:DauBe_WTF.ViewModel.SubVM"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1261" Width="1735" Loaded="Window_Loaded">
+        Title="MainWindow" Height="1261" Width="1735">
 
     <!--d:DataContext="{d:DesignData Type=local:RealTimeChartsVM, IsDesignTimeCreatable=False}">-->
-    <Window.DataContext>
+    <!--<Window.DataContext>
         <main:MainVM/>
-    </Window.DataContext>
+    </Window.DataContext>-->
     <Window.Resources>
         <subvm:DoliVM x:Key="doli"/>
         <subvm:GraphVM x:Key="graph"/>
         <main:MainVM x:Key="mainVM"/>
         <converter:CTRLToUnitStringConverter x:Key="CTRLToUnit"/>
         <converter:CTRLToDestUnitStringConverter x:Key="CTRLToDestUnit"/>
+        <!--<utility:ViewModelLocator x:Key="locator"/>-->
     </Window.Resources>
 
     <Grid x:Name="mainGrid" RenderTransformOrigin="0.697,0.415">
@@ -33,7 +36,7 @@
             <RowDefinition Height="137*"/>
             <RowDefinition Height="253*"/>
         </Grid.RowDefinitions>
-        <Grid Name="DataDisplay"  Grid.Row="0" Grid.Column="0" DataContext="{Binding Path=doli}">
+        <Grid Name="DataDisplay"  Grid.Row="0" Grid.Column="0">
             <StackPanel HorizontalAlignment="Center" Orientation="Vertical" VerticalAlignment="Top" MinHeight="225" MinWidth="790">
                 <StackPanel HorizontalAlignment="Center" MinHeight="70">
                     <StackPanel Orientation="Horizontal">
@@ -46,13 +49,13 @@
                         <Label HorizontalContentAlignment="Center" Content="Extension [mm]" FontWeight="Bold" Cursor="" FontSize="16" Height="35" Width="130"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Height="35" Width="130" Text="{Binding DoliTime}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <TextBox Height="35" Width="130" Text="{Binding Path=Doli.DoliTime}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
                         <Separator Margin="10"/>
-                        <TextBox  Height="35" Width="130" Text="{Binding DoliPosition}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <TextBox  Height="35" Width="130" Text="{Binding Doli.DoliPosition}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
                         <Separator Margin="10"/>
-                        <TextBox Height="35" Width="130" Text="{Binding DoliLoad}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <TextBox Height="35" Width="130" Text="{Binding Doli.DoliLoad}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
                         <Separator Margin="10"/>
-                        <TextBox Height="35" Width="130" Text="{Binding DoliExtend}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
+                        <TextBox Height="35" Width="130" Text="{Binding Doli.DoliExtend}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
                     </StackPanel>
                 </StackPanel>
                 <Separator Margin="30" Width="0"/>
@@ -60,18 +63,18 @@
                     <RichTextBox x:Name="guiDebug" Height="94" Margin="40,0" VerticalAlignment="Bottom" Width="700" >
                         <FlowDocument>
                             <Paragraph>
-                                <Run Text="{Binding TextDisplay}"/>
+                                <Run Text="{Binding Doli.TextDisplay}"/>
                             </Paragraph>
                         </FlowDocument>
                     </RichTextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Command="{Binding DoliOnCommand}" Content="On" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
-                    <Button Command="{Binding DoliOffCommand}" Content="Off" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
+                    <Button Command="{Binding Doli.DoliOnCommand}" Content="On" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
+                    <Button Command="{Binding Doli.DoliOffCommand}" Content="Off" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="40"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="0" Grid.Column="1" DataContext="{StaticResource doli}">
+        <Grid Grid.Row="0" Grid.Column="1">
             <TabControl HorizontalAlignment="Stretch" Height="Auto" Margin="0,10" VerticalAlignment="Stretch" Width="Auto" TabStripPlacement="Right" BorderThickness="0">
                 <TabItem Header="Manual" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
                     <Grid MinWidth="400" Margin="100,0">
@@ -85,14 +88,16 @@
                             <RowDefinition Height="9*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0" Grid.ColumnSpan="3">
-                                <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" MinHeight="40"/>
+                                <Label HorizontalContentAlignment="Center" Content="Controls" FontWeight="Bold" Cursor="" FontSize="25" Width="Auto" MinHeight="50"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="0">
                             <StackPanel VerticalAlignment="Center">
                                 <Label Content="Move CTRL" HorizontalAlignment="Center"/>
-                                <ComboBox ItemsSource="{Binding DoPEItems}" SelectedValue="{Binding ManualCTRL, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Width="120"/>
-                                <Label Content="{Binding ManualCTRL, Converter={StaticResource CTRLToUnit}}" HorizontalAlignment="Center"/>
-                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Velocity}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
+                                <ComboBox ItemsSource="{Binding Doli.DoPEItems}" SelectedValue="{Binding Doli.ManualCTRL, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Width="120"/>
+                                <Label Content="{Binding Doli.ManualCTRL, Converter={StaticResource CTRLToUnit}}" HorizontalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.Velocity}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
+                                <Label Content="Limit Load (N)" HorizontalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.LimLoad, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
                             </StackPanel>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
@@ -101,6 +106,14 @@
                                     <Button.Background>
                                         <ImageBrush ImageSource="Pictures/arrow.png" Stretch="Uniform"/>
                                     </Button.Background>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="PreviewMouseDown">
+                                            <i:InvokeCommandAction Command="{Binding Doli.MoveUpCommand}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="PreviewMouseUp">
+                                            <i:InvokeCommandAction Command="{Binding Doli.StopCommand}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
                                 </Button>
                                 <Button Content="Down" HorizontalAlignment="Center"  VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
                                     <Button.Background>
@@ -110,6 +123,14 @@
                                             </ImageBrush.RelativeTransform>
                                         </ImageBrush>
                                     </Button.Background>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="PreviewMouseDown">
+                                            <i:InvokeCommandAction Command="{Binding Doli.MoveDownCommand}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="PreviewMouseUp">
+                                            <i:InvokeCommandAction Command="{Binding Doli.StopCommand}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
                                 </Button>
                             </StackPanel>
                         </Grid>
@@ -128,7 +149,7 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Automatic" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
-                    <Grid HorizontalAlignment="Center" DataContext="{StaticResource mainVM}">
+                    <Grid HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <Button Command="{Binding AutoPosCommand}" Content="Auto Positionning" Width="150" Height="100"/>
                             <Separator Margin="20" Width="0"/>

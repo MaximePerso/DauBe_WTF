@@ -29,6 +29,7 @@ namespace DauBe_WTF.Utility
             ////}
 
             SimpleIoc.Default.Register<ViewModel.MainVM>();
+            //SimpleIoc.Default.Register<ViewModel.SubVM.DoliVM>();
         }
 
         public ViewModel.MainVM  Main
@@ -38,5 +39,13 @@ namespace DauBe_WTF.Utility
                 return ServiceLocator.Current.GetInstance<ViewModel.MainVM>();
             }
         }
+
+        //public ViewModel.SubVM.DoliVM Doli
+        //{
+        //    get
+        //    {
+        //        return ServiceLocator.Current.GetInstance<ViewModel.SubVM.DoliVM>();
+        //    }
+        //}
     }
 }

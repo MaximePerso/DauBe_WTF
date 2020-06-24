@@ -18,7 +18,7 @@ namespace DauBe_WTF.ViewModel
         private InteractiveGraphUserControl.MVVM.ViewModel _ucVM;
         private SecondaryWindows.AutoPos.AutoPosVM _autopos;
         private SecondaryWindows.InputList.InputListVM _inputList;
-        public SubVM.DoliVM doli { get; } = new SubVM.DoliVM();
+        private SubVM.DoliVM _doli;
         public SubVM.GraphVM graph { get; } = new SubVM.GraphVM();
         public CircularProgressBar.CPBVM pg { get; } = new CircularProgressBar.CPBVM();
         #endregion
@@ -41,7 +41,12 @@ namespace DauBe_WTF.ViewModel
             set
             { _inputList = value; OnPropertyChanged("inputList"); }
         }
-
+        public SubVM.DoliVM Doli
+        {
+            get => _doli;
+            set
+            { _doli = value; OnPropertyChanged("Doli"); }
+        }
         #endregion
         #region Fields
         private bool _isDoliBusy;
@@ -58,16 +63,21 @@ namespace DauBe_WTF.ViewModel
         public ICommand AutoPosCommand { get; set; }
         public ICommand InputListCommand { get; set; }
         public IAsyncCommand OkCommand { get; set; }
+        public ICommand MoveUpCommand { get; set; }
+        public ICommand MoveDownCommand { get; set; }
         #endregion
         public IView view;
 
         public MainVM()
         {
+            //DOli
+            Doli = new SubVM.DoliVM();
+            Doli.ConnectToEdc();
             //Gridgraph usercontrol
             UCVM = new InteractiveGraphUserControl.MVVM.ViewModel(view);
             //Auto positioning windows
-            autopos = new SecondaryWindows.AutoPos.AutoPosVM(pg,doli);
-            inputList = new SecondaryWindows.InputList.InputListVM(doli);
+            autopos = new SecondaryWindows.AutoPos.AutoPosVM(pg,Doli);
+            inputList = new SecondaryWindows.InputList.InputListVM(Doli);
             AutoPosCommand = new RelayCommand(o => FireAutoPosWin());
             InputListCommand = new RelayCommand(o => FireInputListWin());
         }

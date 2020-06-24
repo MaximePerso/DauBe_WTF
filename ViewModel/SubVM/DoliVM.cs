@@ -31,7 +31,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         #region MVVM AREA
 
         #region Log object
-        WriteLog Log = new WriteLog("DoliLog","world");
+        WriteLog Log = new WriteLog("DoliLog", "world");
         #endregion
 
         #region Fields
@@ -174,7 +174,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         public bool IsDoliOn
         {
             get => _isDoliOn;
-            set 
+            set
             { _isDoliOn = value; OnPropertyChanged("IsDoliOn"); }
         }
         public string TextDisplay
@@ -266,6 +266,9 @@ namespace DauBe_WTF.ViewModel.SubVM
         public ICommand DoliOnCommand { get; set; }
         public ICommand DoliOffCommand { get; set; }
         public ICommand DoliGoCommand { get; set; }
+        public ICommand MoveDownCommand { get; set; }
+        public ICommand MoveUpCommand { get; set; }
+        public ICommand StopCommand { get; set; }
         #endregion
         #endregion
 
@@ -278,8 +281,12 @@ namespace DauBe_WTF.ViewModel.SubVM
         /// This object is needed to perform DoPE tasks.
         /// (Similar to the DoPE-handle in C++.)
         /// </summary>
-        private Edc MyEdc;
-
+        private Edc _myEdc;
+    public Edc MyEdc
+        {
+            get => _myEdc;
+            set { _myEdc = value; OnPropertyChanged("MyEdc"); }
+        }
         /// <summary>
         /// TAN number assigned to a DoPE command.
         /// (To get informed when a task has been performed.)
@@ -302,6 +309,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         //private RealTimeCharts NewINstanceOfChart2;
         public delegate void update(double time, double position, double load, double extension);
 
+
         public DoliVM()
         {
             Initialisation();
@@ -316,10 +324,15 @@ namespace DauBe_WTF.ViewModel.SubVM
             //Doli param
             _isDoliOn = false;
             _squishedBall = 25;
+            _limLoad = 1000;
+            _velocity = 10;
             //Commands ini
             DoliOnCommand = new RelayCommand(o => DoliOn(), o => { return !_isDoliOn; });
             DoliOffCommand = new RelayCommand(o => DoliOff(), o => { return _isDoliOn; });
-            DoliGoCommand = new RelayCommand(o => DoliGo(), o => { return (ManualDestination != 0 ); });
+            DoliGoCommand = new RelayCommand(o => DoliGo(), o => { return (ManualDestination != 0); });
+            MoveDownCommand = new RelayCommand(o => moveDown());
+            MoveUpCommand = new RelayCommand(o => moveUp());
+            StopCommand = new RelayCommand(o => stop());
             //AutoPosCommand = new RelayCommand();
         }
         #endregion  
@@ -408,7 +421,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         {
             if (error != DoPE.ERR.NOERROR)
                 Display(Text + " Error: " + error + "\n");
-            else if(IsDoliOn == true)
+            else if (IsDoliOn == true)
             {
                 Display("Doli is ON ! \n");
             }
@@ -727,44 +740,7 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         }
 
-        private void moveUp()
-        {
-            double speed = Math.Abs(DefaultVel);
-            Int32 i = MyEdc.DoPEDllHdl;
-            DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.UP, DoPE.CTRL.POS, speed, ref MyTan);
 
-            //Setup security load
-            double uprLim = Math.Abs(LimLoad);
-            double lwrLim = -1.0 * Math.Abs(LimLoad);
-            // When pressing up button, only risk is to apply to much tensile load. However in the case the user went to far while applying a
-            // pressure load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
-            // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
-            // in the DOLI settings that prevails over everything.
-            DoPE.ERR error2 = MyEdc.Ctrl.Sft(DoPE.CTRL.LOAD, uprLim, lwrLim * 5.0, DoPE.REACT.ACTION);
-        }
-
-        private void moveDown()
-        {
-            double speed = Math.Abs(DefaultVel);
-            Int32 i = MyEdc.DoPEDllHdl;
-            DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.DOWN, DoPE.CTRL.POS, speed, ref MyTan);
-
-            //Setup security load
-            double uprLim = Math.Abs(LimLoad);
-            double lwrLim = -1.0 * Math.Abs(LimLoad);
-            // When pressing down button, only risk is to apply to much pressure. However in the case the user went to far while applying a
-            // tensile load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
-            // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
-            // in the DOLI settings that prevails over everything.
-            DoPE.ERR error2 = MyEdc.Ctrl.Sft(DoPE.CTRL.LOAD, uprLim * 5.0, lwrLim, DoPE.REACT.ACTION);
-        }
-
-        private void stop()
-        {
-            DoPE.ERR error = MyEdc.Move.Halt(DoPE.CTRL.POS, ref MyTan);
-            // resets the sorftend limit in case it has been reached
-            resetSft();
-        }
 
         private void resetSft()
         // function used to reset softend for the user to be able to send other command from the window
@@ -884,6 +860,47 @@ namespace DauBe_WTF.ViewModel.SubVM
             double velLim = 5;
             // On replace le piston à sa place basse
             Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
+        }
+        #endregion
+
+        #region Move doli methods
+        public void moveUp()
+        {
+            double speed = Math.Abs(Velocity);
+            Int32 i = MyEdc.DoPEDllHdl;
+            DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.UP, DoPE.CTRL.POS, speed, ref MyTan);
+
+            //Setup security load
+            double uprLim = Math.Abs(LimLoad);
+            double lwrLim = -1.0 * Math.Abs(LimLoad);
+            // When pressing up button, only risk is to apply to much tensile load. However in the case the user went to far while applying a
+            // pressure load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
+            // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
+            // in the DOLI settings that prevails over everything.
+            DoPE.ERR error2 = MyEdc.Ctrl.Sft(DoPE.CTRL.LOAD, uprLim, lwrLim * 5.0, DoPE.REACT.ACTION);
+        }
+
+        public void moveDown()
+        {
+            double speed = Math.Abs(Velocity);
+            Int32 i = MyEdc.DoPEDllHdl;
+            DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.DOWN, DoPE.CTRL.POS, speed, ref MyTan);
+
+            //Setup security load
+            double uprLim = Math.Abs(LimLoad);
+            double lwrLim = -1.0 * Math.Abs(LimLoad);
+            // When pressing down button, only risk is to apply to much pressure. However in the case the user went to far while applying a
+            // tensile load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
+            // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
+            // in the DOLI settings that prevails over everything.
+            DoPE.ERR error2 = MyEdc.Ctrl.Sft(DoPE.CTRL.LOAD, uprLim * 5.0, lwrLim, DoPE.REACT.ACTION);
+        }
+
+        public void stop()
+        {
+            DoPE.ERR error = MyEdc.Move.Halt(DoPE.CTRL.POS, ref MyTan);
+            // resets the sorftend limit in case it has been reached
+            resetSft();
         }
         #endregion
 
