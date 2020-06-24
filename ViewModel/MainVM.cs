@@ -17,6 +17,7 @@ namespace DauBe_WTF.ViewModel
         #region Sub VM Fields
         private InteractiveGraphUserControl.MVVM.ViewModel _ucVM;
         private SecondaryWindows.AutoPos.AutoPosVM _autopos;
+        private SecondaryWindows.InputList.InputListVM _inputList;
         public SubVM.DoliVM doli { get; } = new SubVM.DoliVM();
         public SubVM.GraphVM graph { get; } = new SubVM.GraphVM();
         public CircularProgressBar.CPBVM pg { get; } = new CircularProgressBar.CPBVM();
@@ -34,6 +35,13 @@ namespace DauBe_WTF.ViewModel
             set
             { _autopos = value; OnPropertyChanged("autopos"); }
         }
+        public SecondaryWindows.InputList.InputListVM inputList
+        {
+            get => _inputList;
+            set
+            { _inputList = value; OnPropertyChanged("inputList"); }
+        }
+
         #endregion
         #region Fields
         private bool _isDoliBusy;
@@ -59,8 +67,9 @@ namespace DauBe_WTF.ViewModel
             UCVM = new InteractiveGraphUserControl.MVVM.ViewModel(view);
             //Auto positioning windows
             autopos = new SecondaryWindows.AutoPos.AutoPosVM(pg,doli);
+            inputList = new SecondaryWindows.InputList.InputListVM(doli);
             AutoPosCommand = new RelayCommand(o => FireAutoPosWin());
-            InputListCommand = new RelayCommand(o => InputListWin());
+            InputListCommand = new RelayCommand(o => FireInputListWin());
         }
 
         private void FireAutoPosWin()

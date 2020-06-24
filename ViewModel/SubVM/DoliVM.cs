@@ -16,6 +16,8 @@ using Doli.DoPE;
 using DauBe_WTF.Utility;
 using System.Threading;
 using System.Windows.Threading;
+using System.Collections.ObjectModel;
+using InteractiveGraphUserControl.MVVM;
 
 namespace DauBe_WTF.ViewModel.SubVM
 {
@@ -27,6 +29,11 @@ namespace DauBe_WTF.ViewModel.SubVM
         #endregion
 
         #region MVVM AREA
+
+        #region Log object
+        WriteLog Log = new WriteLog("DoliLog","world");
+        #endregion
+
         #region Fields
         #region Doli outputs
         private Dictionary<string, double> _doliData;
@@ -63,8 +70,11 @@ namespace DauBe_WTF.ViewModel.SubVM
         #region DoliCTRL
         private DoPE.CTRL _manualCTRL;
         private double _manualDestination;
+        private int _cycleNb;
+        private int _inputNb;
         #endregion
         #endregion
+
         #region Properties
         #region Doli outputs
         //public Dictionary<string,double> DoliData
@@ -234,8 +244,21 @@ namespace DauBe_WTF.ViewModel.SubVM
             set
             { _manualDestination = value; OnPropertyChanged("ManualDestination"); }
         }
+        public int CycleNb
+        {
+            get => _cycleNb;
+            set
+            { _cycleNb = value; OnPropertyChanged("CylcleNb"); }
+        }
+        public int InputNb
+        {
+            get => _inputNb;
+            set
+            { _inputNb = value; OnPropertyChanged("InputNb"); }
+        }
         #endregion
         #endregion
+
         #region "Static" values
         public string[] DoPEItems { get; set; }
         #endregion
@@ -473,11 +496,8 @@ namespace DauBe_WTF.ViewModel.SubVM
 
                     //il faudrait utiliser une property dependency pour optimiser l'utilisation de la mémoire
                     DoliTime = Sample.Time;
-
                     DoliPosition = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S];
-
                     DoliLoad = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F];
-
                     DoliExtend = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E];
                 }
             }
@@ -799,41 +819,45 @@ namespace DauBe_WTF.ViewModel.SubVM
         }
         #endregion
 
-        #region BUTTON ACTION
+        //#region BUTTON ACTION
 
-        private void upBut_MouseDown(object sender, MouseEventArgs e)
-        {
-            // in case the user did not specify a speed
-            if (DefaultVel == 0)
-            {
-                DefaultVel = 1.0;
-            }
-            moveUp();
-        }
+        //private void upBut_MouseDown(object sender, MouseEventArgs e)
+        //{
+        //    // in case the user did not specify a speed
+        //    if (DefaultVel == 0)
+        //    {
+        //        DefaultVel = 1.0;
+        //    }
+        //    moveUp();
+        //}
 
-        private void _MouseUp(object sender, MouseEventArgs e)
-        {
-            stop();
-        }
+        //private void _MouseUp(object sender, MouseEventArgs e)
+        //{
+        //    stop();
+        //}
 
-        private void downBut_MouseDown(object sender, EventArgs e)
-        {
-            // in case the user did not specify a speed
-            if (DefaultVel == 0)
-            {
-                DefaultVel = 1.0;
-            }
-            moveDown();
-        }
+        //private void downBut_MouseDown(object sender, EventArgs e)
+        //{
+        //    // in case the user did not specify a speed
+        //    if (DefaultVel == 0)
+        //    {
+        //        DefaultVel = 1.0;
+        //    }
+        //    moveDown();
+        //}
 
-        #endregion
+        //#endregion
 
+        #region Start Doli
         private void DoliGo()
         {
             double dest = Destination;
             DoPE.CTRL CTRL = SelectedMoveCTRL;
             moveToDest(CTRL, dest);
         }
+        #endregion
+
+        #region Autopos
         public void AutoPosApproach()
         {
             double velLim = 100; //Deplacement de la X-head à 100 mm/s
@@ -861,6 +885,61 @@ namespace DauBe_WTF.ViewModel.SubVM
             // On replace le piston à sa place basse
             Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
         }
+        #endregion
+
+        #region Complexe command cycle
+        public void ComplexeCycle(int NbCycles, ObservableCollection<DoliInput> DoliInputCollection)
+        {
+            //start complexe movement
+            Error = MyEdc.Combined.StartCMD(NbCycles, DoPE.CMD_MODE.MESSAGE);
+            //execute list of commands
+            foreach (var input in DoliInputCollection)
+            {
+                try
+                {
+                    DoPE.CTRL destCTRL = DoPE.CTRL.POS;
+                    DoPE.DESTMODE destMode = DoPE.DESTMODE.APPROACH;
+                    DoPE.CTRL moveCTRL = DoPE.CTRL.POS;
+                    DoPE.LIMITMODE limMode = DoPE.LIMITMODE.NOT_ACTIVE;
+
+                    if (input.DestCtrl == "Load")
+                        destCTRL = DoPE.CTRL.LOAD;
+                    if (input.MoveCtrl == "Load")
+                        moveCTRL = DoPE.CTRL.LOAD;
+                    if (input.DestMode == "Position")
+                        destMode = DoPE.DESTMODE.DEST_POSITION;
+                    else if (input.DestMode == "Maintain")
+                        destMode = DoPE.DESTMODE.DEST_MAINTAIN;
+                    if (input.LimMode == "Absolute")
+                        limMode = DoPE.LIMITMODE.ABSOLUTE;
+                    else if (input.LimMode == "Relative")
+                        limMode = DoPE.LIMITMODE.RELATIVE;
+
+
+                    if (input.MoveCtrl == "Halt")
+                    {
+                        MyEdc.Move.HaltW(destCTRL, input.Speed, ref MyTan);
+                        Log.LogWrite("Halt command: DestCtrl = " + input.DestCtrl + ", waiting time = " + input.Speed + "s.", "Command");
+                    }
+                    else
+                    {
+                        MyEdc.Move.PosExt(moveCTRL, input.Speed, limMode, input.Limit, destCTRL, input.Destination, destMode, ref MyTan);
+                        Log.LogWrite("Move commnad: MoveCtrl = " + input.MoveCtrl + ", speed = " + input.Speed + "unit, LimMode = " + input.LimMode +
+                            ", Limit = " + input.Limit + "unit, DestCtrl = " + input.DestCtrl + ", Destination = " + input.Destination +
+                            ", DestMode = " + input.DestMode, "Command");
+                    }
+                }
+                catch
+                {
+                    Log.LogWrite("Error during a ComplexCyle. Input numbre : " + input.SequenceNumber, "Error");
+                    DoPE.ERR error = MyEdc.Move.Halt(DoPE.CTRL.POS, ref MyTan);
+                }
+            }
+            //stop complex movement
+            Error = MyEdc.Combined.EndCMD(DoPE.CMD_OPERATION.START);
+        }
+
+        #endregion
 
         private void btnRecord_Click(object sender, EventArgs e)
         {

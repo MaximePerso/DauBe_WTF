@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using InteractiveGraphUserControl;
+using InteractiveGraphUserControl.Utility;
 
 namespace DauBe_WTF.SecondaryWindows.InputList
 {
@@ -19,9 +21,13 @@ namespace DauBe_WTF.SecondaryWindows.InputList
     /// </summary>
     public partial class InputLitst : Window
     {
+        private ViewModel.SubVM.DoliVM _doli;
+
         public InputLitst()
         {
             InitializeComponent();
+            this.DataContext = new InputListVM(_doli);
         }
+
     }
 }

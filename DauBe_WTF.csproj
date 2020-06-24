@@ -75,8 +75,9 @@
     <Reference Include="GalaSoft.MvvmLight.Platform, Version=5.4.1.0, Culture=neutral, PublicKeyToken=5f873c45e98af8a1, processorArchitecture=MSIL">
       <HintPath>packages\MvvmLightLibs.5.4.1.1\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
     </Reference>
-    <Reference Include="InteractiveGraphUserControl">
-      <HintPath>Ressources\InteractiveGraphUserControl.dll</HintPath>
+    <Reference Include="InteractiveGraphUserControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\MaximePerso\InteractiveGraphUserControl\bin\Debug\InteractiveGraphUserControl.dll</HintPath>
     </Reference>
     <Reference Include="LiveCharts">
       <HintPath>Ressources\LiveCharts.dll</HintPath>
@@ -128,6 +129,7 @@
     <Compile Include="Utility\AsyncCommand.cs" />
     <Compile Include="Utility\NotifyTaskCompletion.cs" />
     <Compile Include="Utility\ViewModelLocator.cs" />
+    <Compile Include="Utility\WriteLog.cs" />
     <Compile Include="ViewModel\SubVM\DoliVM.cs" />
     <Compile Include="ViewModel\SubVM\GraphVM.cs" />
     <Compile Include="ViewModel\MainVM.cs" />

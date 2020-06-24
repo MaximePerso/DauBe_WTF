@@ -57,7 +57,7 @@
                 </StackPanel>
                 <Separator Margin="30" Width="0"/>
                 <StackPanel Margin="0">
-                    <RichTextBox x:Name="guiDebug" Height="94" Margin="40,0" VerticalAlignment="Bottom" Width="auto" >
+                    <RichTextBox x:Name="guiDebug" Height="94" Margin="40,0" VerticalAlignment="Bottom" Width="700" >
                         <FlowDocument>
                             <Paragraph>
                                 <Run Text="{Binding TextDisplay}"/>

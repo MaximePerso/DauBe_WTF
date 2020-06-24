@@ -162,9 +162,8 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
                                     IsBallOn = true;
                                     Loading1Opacity = 1;
                                     Step1Foreground = Brushes.Green;
-                                    await pouetpouet();
-                                    //await AsyncAutoPosApproach();
-                                    //await AsyncAutoPosBallRelease();
+                                    await AsyncAutoPosApproach();
+                                    await AsyncAutoPosBallRelease();
                                     Instructions = "Veuillez enlever la balle en caoutchouc";
                                     ArrowOpacity1 = 1;
                                     Loading1Opacity = 0;
@@ -180,8 +179,7 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
                                     Step2Foreground = Brushes.Green;
                                     Step3Foreground = Brushes.Orange;
                                     _pg.Loading2Opacity = 1;
-                                    await pouetpouet();
-                                    //await AsyncAutoPosFinal();
+                                    await AsyncAutoPosFinal();
                                     Instructions = "Le piston est en place !";
                                     Step3Foreground = Brushes.Green;
                                     _pg.Loading2Opacity = 0;
@@ -210,18 +208,11 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
             });
         }
 
-        public async Task AsyncInitialisation()
-        {
-            await Task.Run(() =>
-            {
-                Initialisation();
-            });
-        }
-
         public async Task AsyncAutoPosFinal()
         {
             _pg.ProgressValue = 0;
             // On replace le piston à sa place basse
+            _doli.AutoPosFinal();
             await Task.Run(() =>
             {
                 while (Math.Round(_doli.DoliPosition, 2) != Math.Round(_doli.TempDestination, 2))
@@ -234,6 +225,7 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
 
         public async Task AsyncAutoPosApproach()
         {
+            _doli.AutoPosApproach();
             await Task.Run(() =>
             {
                 while (Math.Abs(_doli.DoliLoad) < Math.Abs(_doli.TempLim) * 0.8)
@@ -245,6 +237,7 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
 
         public async Task AsyncAutoPosBallRelease()
         {
+            _doli.AutoPosBallRelease();
             await Task.Run(() =>
             {
                 while (Math.Abs(Math.Abs(_doli.DoliPosition) - Math.Abs(_doli.TempDestination)) > 0.2)
