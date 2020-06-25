@@ -31,34 +31,34 @@
         <Grid Grid.Row="0">
             <Label Content="Instructions" FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Center"/>
         </Grid>
-        <Grid Grid.Row="1" DataContext="{Binding Main, Source={StaticResource locator}}">
+        <Grid Grid.Row="1">
             <StackPanel Orientation="Vertical">
-                <Label Content="{Binding autopos.Instructions}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="60"/>
-                <Button Content="Ok" Command="{Binding autopos.AutoPosCycle}" Width="120" Height="20"/>
+                <Label Content="{Binding Instructions}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="60"/>
+                <Button Content="Ok" Command="{Binding AutoPosCycle}" Width="120" Height="20"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
             <Label Content="Process state" FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Center"/>
         </Grid>
-        <Grid Grid.Row="3" DataContext="{Binding Main, Source={StaticResource locator}}">
+        <Grid Grid.Row="3">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel Orientation="Vertical">
-                    <Label Content="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" FontWeight="Bold" Foreground="{Binding autopos.Step1Foreground}" />
-                    <Label Content="Initialisation" Foreground="{Binding autopos.Step1Foreground}"/>
+                    <Label Content="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" FontWeight="Bold" Foreground="{Binding Step1Foreground}" />
+                    <Label Content="Initialisation" Foreground="{Binding Step1Foreground}"/>
                 </StackPanel>
                 <Separator Margin="10" Width="0"/>
                 <Grid>
-                    <fa:ImageAwesome Icon="LongArrowRight" Foreground="{Binding autopos.Step1Foreground}" Height="30" Width="100" HorizontalAlignment="Center" Opacity="{Binding autopos.ArrowOpacity1}"/>
-                    <fa:ImageAwesome Icon="Spinner" Foreground="Orange" Spin="True" SpinDuration="10" Width="60" HorizontalAlignment="Center" Opacity="{Binding autopos.Loading1Opacity}"/>
+                    <fa:ImageAwesome Icon="LongArrowRight" Foreground="{Binding Step1Foreground}" Height="30" Width="100" HorizontalAlignment="Center" Opacity="{Binding ArrowOpacity1}"/>
+                    <fa:ImageAwesome Icon="Spinner" Foreground="Orange" Spin="True" SpinDuration="10" Width="60" HorizontalAlignment="Center" Opacity="{Binding Loading1Opacity}"/>
                 </Grid>
                 <Separator Margin="10" Width="0"/>
                 <StackPanel Orientation="Vertical">
-                    <Label Content="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" FontWeight="Bold" Foreground="{Binding autopos.Step2Foreground}"  Opacity="{Binding autopos.Opacity2}" />
-                    <Label Content="Approach" Foreground="{Binding autopos.Step2Foreground}" Opacity="{Binding autopos.Opacity2}"/>
+                    <Label Content="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" FontWeight="Bold" Foreground="{Binding Step2Foreground}"  Opacity="{Binding Opacity2}" />
+                    <Label Content="Approach" Foreground="{Binding Step2Foreground}" Opacity="{Binding Opacity2}"/>
                 </StackPanel>
                 <Separator Margin="10" Width="0"/>
                 <Grid>
-                    <fa:ImageAwesome Icon="LongArrowRight" Foreground="{Binding autopos.Step2Foreground}" Height="30" Width="100" HorizontalAlignment="Center" Opacity="{Binding autopos.ArrowOpacity2}"/>
+                    <fa:ImageAwesome Icon="LongArrowRight" Foreground="{Binding Step2Foreground}" Height="30" Width="100" HorizontalAlignment="Center" Opacity="{Binding ArrowOpacity2}"/>
                     <cpb:CircularProgressBar Grid.Row="2" Thickness="10" Radius="50" Value="{Binding pg.ProgressValue}" Style="{StaticResource CircularProgressBarStyle}" 
                                              Background="Red" Fill="AntiqueWhite" Stroke="Orange" StrokeThickness="10" StrokeMode="Middle" EndLineCap="Round" Opacity="{Binding pg.Loading2Opacity}" />
                     <Label Content="{Binding pg.ProgressText}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Opacity="{Binding pg.Loading2Opacity}" />
@@ -67,8 +67,8 @@
                 </Grid>
                 <Separator Margin="10" Width="0"/>
                 <StackPanel Orientation="Vertical">
-                    <fa:ImageAwesome Icon="CheckCircle" Height="90" Width="60" Foreground="{Binding autopos.Step3Foreground}" Opacity="{Binding autopos.Opacity3}"/>
-                    <Label Content="Done !" HorizontalContentAlignment="Center" Foreground="{Binding autopos.Step3Foreground}" Opacity="{Binding autopos.Opacity3}"/>
+                    <fa:ImageAwesome Icon="CheckCircle" Height="90" Width="60" Foreground="{Binding Step3Foreground}" Opacity="{Binding Opacity3}"/>
+                    <Label Content="Done !" HorizontalContentAlignment="Center" Foreground="{Binding Step3Foreground}" Opacity="{Binding Opacity3}"/>
                 </StackPanel>
             </StackPanel>
         </Grid>

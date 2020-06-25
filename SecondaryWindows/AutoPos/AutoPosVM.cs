@@ -32,8 +32,14 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
         #endregion
 
         #region Properties
-        private CircularProgressBar.CPBVM _pg { get; }
+        private CircularProgressBar.CPBVM _pg;
         private ViewModel.SubVM.DoliVM _doli { get; }
+        public CPBVM pg
+        {
+            get => _pg;
+            set
+            { _pg = value; OnPropertyChanged("pg"); }
+        }
         public string Instructions
         {
             get => _instructions;
@@ -116,9 +122,9 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
         public AutoPosVM() { }
         public AutoPosVM(CPBVM pg, ViewModel.SubVM.DoliVM doli)
         {
-            Initialisation();
-            _doli = doli;
             _pg = pg;
+            _doli = doli;
+            Initialisation();
             OkCommand = new RelayCommand(o => { Console.WriteLine(Opacity3); });
         }
         #endregion
@@ -162,8 +168,8 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
                                     IsBallOn = true;
                                     Loading1Opacity = 1;
                                     Step1Foreground = Brushes.Green;
-                                    await AsyncAutoPosApproach();
-                                    await AsyncAutoPosBallRelease();
+                                    await AsyncAutoPosApproach(_doli);
+                                    await AsyncAutoPosBallRelease(_doli);
                                     Instructions = "Veuillez enlever la balle en caoutchouc";
                                     ArrowOpacity1 = 1;
                                     Loading1Opacity = 0;
@@ -179,7 +185,7 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
                                     Step2Foreground = Brushes.Green;
                                     Step3Foreground = Brushes.Orange;
                                     _pg.Loading2Opacity = 1;
-                                    await AsyncAutoPosFinal();
+                                    await AsyncAutoPosFinal(_doli, _pg);
                                     Instructions = "Le piston est en place !";
                                     Step3Foreground = Brushes.Green;
                                     _pg.Loading2Opacity = 0;
@@ -208,40 +214,43 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
             });
         }
 
-        public async Task AsyncAutoPosFinal()
+        public async Task AsyncAutoPosFinal(ViewModel.SubVM.DoliVM _doli, CPBVM _pg)
         {
-            _pg.ProgressValue = 0;
+            pg.ProgressValue = 0;
             // On replace le piston à sa place basse
             _doli.AutoPosFinal();
             await Task.Run(() =>
             {
                 while (Math.Round(_doli.DoliPosition, 2) != Math.Round(_doli.TempDestination, 2))
                 {
-                    _pg.ProgressValue = Math.Round((1 - (Math.Abs(Math.Abs(_doli.DoliPosition - _doli.TempDestination)) / _doli.SquishedBall) * 100), 1);
+                    pg.ProgressValue = 100 + Math.Round((1 - (Math.Abs(Math.Abs(_doli.DoliPosition - _doli.TempDestination)) / _doli.SquishedBall) * 100), 1);
                     System.Threading.Thread.Sleep(25);
                 }
             });
         }
 
-        public async Task AsyncAutoPosApproach()
+        public async Task AsyncAutoPosApproach(ViewModel.SubVM.DoliVM _doli)
         {
             _doli.AutoPosApproach();
+            Console.WriteLine("DoliLoad = " + _doli.DoliLoad + ", TempLim = " + _doli.TempLim);
             await Task.Run(() =>
             {
-                while (Math.Abs(_doli.DoliLoad) < Math.Abs(_doli.TempLim) * 0.8)
+                while (Math.Abs(_doli.TempLim - _doli.DoliLoad) > 10)
                 {
                     System.Threading.Thread.Sleep(250);
                 }
             });
         }
 
-        public async Task AsyncAutoPosBallRelease()
+        public async Task AsyncAutoPosBallRelease(ViewModel.SubVM.DoliVM _doli)
         {
             _doli.AutoPosBallRelease();
             await Task.Run(() =>
             {
+                Console.WriteLine("DoliLoad = " + _doli.DoliPosition + ", TempLim = " + _doli.TempDestination);
                 while (Math.Abs(Math.Abs(_doli.DoliPosition) - Math.Abs(_doli.TempDestination)) > 0.2)
                 {
+                    Console.WriteLine("DoliLoad = " + _doli.DoliPosition + ", TempLim = " + _doli.TempDestination);
                     System.Threading.Thread.Sleep(250);
                 }
             });

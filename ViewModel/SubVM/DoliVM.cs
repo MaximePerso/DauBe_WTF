@@ -18,6 +18,7 @@ using System.Threading;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
 using InteractiveGraphUserControl.MVVM;
+using System.Windows.Forms;
 
 namespace DauBe_WTF.ViewModel.SubVM
 {
@@ -58,7 +59,9 @@ namespace DauBe_WTF.ViewModel.SubVM
         private DoPE.ERR _error;
         private string _textDisplay;
         private double _defaultVel;
-        private double _limLoad;
+        private double _upperLimLoad;
+        private double _lowerLimLoad;
+        private double _manualVelocity;
         private double _velocity;
         private double _destination;
         private DoPE.CTRL _selectedMoveCTRL;
@@ -72,6 +75,10 @@ namespace DauBe_WTF.ViewModel.SubVM
         private double _manualDestination;
         private int _cycleNb;
         private int _inputNb;
+        private double _curLoadTare;
+        private double _curPosTare;
+        private double _curLoadBasicTare;
+        private double _curPosBasicTare;
         #endregion
         #endregion
 
@@ -189,11 +196,23 @@ namespace DauBe_WTF.ViewModel.SubVM
             set
             { _defaultVel = value; OnPropertyChanged("DefaultVel"); }
         }
-        public double LimLoad
+        public double UpperLimLoad
         {
-            get => _limLoad;
+            get => _upperLimLoad;
             set
-            { _limLoad = value; OnPropertyChanged("LimLoad"); }
+            { _upperLimLoad = value; OnPropertyChanged("UpperLimLoad"); }
+        }
+        public double LowerLimLoad
+        {
+            get => _lowerLimLoad;
+            set
+            { _lowerLimLoad = value; OnPropertyChanged("LowerLimLoad"); }
+        }
+        public double ManualVelocity
+        {
+            get => _manualVelocity;
+            set
+            { _manualVelocity = value; OnPropertyChanged("ManualVelocity"); }
         }
         public double Velocity
         {
@@ -256,6 +275,30 @@ namespace DauBe_WTF.ViewModel.SubVM
             set
             { _inputNb = value; OnPropertyChanged("InputNb"); }
         }
+        public double CurPosTare
+        {
+            get => _curPosTare;
+            set
+            { _curPosTare = value; OnPropertyChanged("CurPosTare"); }
+        }
+        public double CurLoadTare
+        {
+            get => _curLoadTare;
+            set
+            { _curLoadTare = value; OnPropertyChanged("CurLoadTare"); }
+        }
+        public double CurPosBasicTare
+        {
+            get => _curPosBasicTare;
+            set
+            { _curPosBasicTare = value; OnPropertyChanged("CurPosBasicTare"); }
+        }
+        public double CurLoadBasicTare
+        {
+            get => _curLoadBasicTare;
+            set
+            { _curLoadBasicTare = value; OnPropertyChanged("CurLoadBasicTare"); }
+        }
         #endregion
         #endregion
 
@@ -269,6 +312,10 @@ namespace DauBe_WTF.ViewModel.SubVM
         public ICommand MoveDownCommand { get; set; }
         public ICommand MoveUpCommand { get; set; }
         public ICommand StopCommand { get; set; }
+        public ICommand PosBasicTare { get; set; }
+        public ICommand LoadBasicTare { get; set; }
+        public ICommand PosTare { get; set; }
+        public ICommand LoadTare { get; set; }
         #endregion
         #endregion
 
@@ -282,7 +329,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         /// (Similar to the DoPE-handle in C++.)
         /// </summary>
         private Edc _myEdc;
-    public Edc MyEdc
+        public Edc MyEdc
         {
             get => _myEdc;
             set { _myEdc = value; OnPropertyChanged("MyEdc"); }
@@ -324,15 +371,26 @@ namespace DauBe_WTF.ViewModel.SubVM
             //Doli param
             _isDoliOn = false;
             _squishedBall = 25;
-            _limLoad = 1000;
+            _upperLimLoad = 1000;
+            _lowerLimLoad = -1000;
+            _manualVelocity = 10;
+            _manualCTRL = DoPE.CTRL.POS;
             _velocity = 10;
+            _curLoadBasicTare = 0;
+            _curLoadTare = 0;
+            _curPosTare = 0;
+            _curPosBasicTare = 0;
             //Commands ini
             DoliOnCommand = new RelayCommand(o => DoliOn(), o => { return !_isDoliOn; });
             DoliOffCommand = new RelayCommand(o => DoliOff(), o => { return _isDoliOn; });
-            DoliGoCommand = new RelayCommand(o => DoliGo(), o => { return (ManualDestination != 0); });
+            DoliGoCommand = new RelayCommand(o => moveToDest());
             MoveDownCommand = new RelayCommand(o => moveDown());
             MoveUpCommand = new RelayCommand(o => moveUp());
             StopCommand = new RelayCommand(o => stop());
+            LoadBasicTare = new RelayCommand(o => BasicTare("Load"));
+            PosBasicTare = new RelayCommand(o => BasicTare("Position"));
+            PosTare = new RelayCommand(o => Tare("Position"));
+            LoadTare = new RelayCommand(o => Tare("Load"));
             //AutoPosCommand = new RelayCommand();
         }
         #endregion  
@@ -543,11 +601,11 @@ namespace DauBe_WTF.ViewModel.SubVM
               PosMsg.DoPError, PosMsg.Reached, PosMsg.Time, PosMsg.Control, PosMsg.Position, PosMsg.DControl, PosMsg.Destination, PosMsg.usTAN));
             // get the control mode defined in the dropping menu
             DoPE.CTRL control = SelectedMoveCTRL;
-            // if current control mode is position AND the limit load is reached, proc that message
-            if ((control == DoPE.CTRL.POS) & ((Math.Abs(PosMsg.Destination) > Math.Abs(LimLoad) * 0.90)))
-            {
-                MessageBox.Show("ERROR: you exceed 90% of the defined limit load");
-            }
+            //// if current control mode is position AND the limit load is reached, proc that message
+            //if ((control == DoPE.CTRL.POS) & ((Math.Abs(PosMsg.Destination) > Math.Abs(LimLoad) * 0.90)))
+            //{
+            //    MessageBox.Show("ERROR: you exceed 90% of the defined limit load");
+            //}
 
             return 0;
         }
@@ -573,19 +631,17 @@ namespace DauBe_WTF.ViewModel.SubVM
             Display(string.Format("OnSftMsg: DoPError={0} Upper={1} Time={2} Control={3} Position={4} usTAN={5} \n",
               SftMsg.DoPError, SftMsg.Upper, SftMsg.Time, SftMsg.Control, SftMsg.Position, SftMsg.usTAN));
             // Gentle message to inform the user he may have fucked up
-            MessageBox.Show("TU AS MERDE MAURICE, RETOUR A LA VALEUR DE PRESSION LIMITE");
+            System.Windows.Forms.MessageBox.Show("TU AS MERDE MAURICE, RETOUR A LA VALEUR DE PRESSION LIMITE");
             // The following moves the x-head to lower the load in case the user went to far. SftMsg.Position actually stores the load ...
             resetSft();
-            double endDest = Math.Abs(LimLoad);
-            if (SftMsg.Position < 0.0)
+            //on replace le piston à la valeur limite équivalente
+            if (SftMsg.Position < LowerLimLoad)
             {
-                Console.WriteLine("negatif = " + -endDest);
-                MyEdc.Move.Pos(DoPE.CTRL.LOAD, 500, -endDest, ref MyTan);
+                MyEdc.Move.Pos(DoPE.CTRL.LOAD, 500, LowerLimLoad, ref MyTan);
             }
             else
             {
-                Console.WriteLine("positif = " + endDest);
-                MyEdc.Move.Pos(DoPE.CTRL.LOAD, 0.1, endDest, ref MyTan);
+                MyEdc.Move.Pos(DoPE.CTRL.LOAD, 0.1, UpperLimLoad, ref MyTan);
             }
             return 0;
         }
@@ -745,41 +801,12 @@ namespace DauBe_WTF.ViewModel.SubVM
         private void resetSft()
         // function used to reset softend for the user to be able to send other command from the window
         {
-            double uprLim = Math.Abs(LimLoad) * 5.0;
-            double lwrLim = -1.0 * Math.Abs(LimLoad) * 5.0;
+            double uprLim = UpperLimLoad * 5.0;
+            double lwrLim = LowerLimLoad * 5.0;
             DoPE.ERR error2 = MyEdc.Ctrl.Sft(DoPE.CTRL.LOAD, uprLim, lwrLim, DoPE.REACT.STATUS);
         }
 
-        public void moveToDest(DoPE.CTRL controlMove, double destination, double velLim = 1.0, double limit = 0.0, short yourRef = 0, int flag = 0)
-        {
-            // in case the user did not specify a speed
-            if (Velocity == 0)
-            {
-                Velocity = 1.0;
-            }
-            velLim = Velocity;
-            limit = -Math.Abs(LimLoad);
-            // distinction required, otherwise the X-head only move in one given direction
-            if (destination > ListData.OnDataPosition)
-            {
-                limit = -limit;
-            }
-            DoPE.ERR error;
-            //    controlMove, decDest, destination, DoPE.DESTMODE.DEST_POSITION, ref MyTan);
-            // Special move in case position is used for destination. It fixes a limit load to avoid problems
-            if (controlMove == DoPE.CTRL.POS)
-            {
-                // in this command, the limit and the destination have been inverted so the x-head is piloted using movement speed instead of loading speed (much
-                // faster). However, it means that if the limit load is reached, OnPosMsg will proc instead of OnLPosMsg
-                error = MyEdc.Move.PosExt(controlMove, velLim, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, limit, DoPE.DESTMODE.APPROACH, ref MyTan);
-            }
-            else
-            {
-                //MessageBox.Show("controlMove " + controlMove.ToString() + ", velocity " + velLim.ToString() + ", destination " + destination.ToString() + ", MyTan " + MyTan.ToString());           
-                error = MyEdc.Move.Pos(controlMove, velLim, destination, ref MyTan);
-            }
-            Display(error.ToString());
-        }
+
 
         private void ResetList()
         {
@@ -825,14 +852,43 @@ namespace DauBe_WTF.ViewModel.SubVM
         //#endregion
 
         #region Start Doli
-        private void DoliGo()
+        //private void DoliGo()
+        //{
+        //    double dest = Destination;
+        //    DoPE.CTRL CTRL = SelectedMoveCTRL;
+        //    moveToDest(CTRL, dest);
+        //}
+        #endregion
+
+        #region Tare
+        private void Tare(string ctrl)
         {
-            double dest = Destination;
-            DoPE.CTRL CTRL = SelectedMoveCTRL;
-            moveToDest(CTRL, dest);
+            if (ctrl == "Position")
+            {
+                CurPosTare += DoliPosition;
+                MyEdc.Tare.SetTare(DoPE.SENSOR.SENSOR_S, CurPosTare);
+            }
+            else if (ctrl == "Load")
+            {
+                CurLoadTare += DoliLoad;
+                MyEdc.Tare.SetTare(DoPE.SENSOR.SENSOR_F, CurLoadTare);
+            }
         }
         #endregion
 
+        private void BasicTare(string ctrl)
+        {
+            if (ctrl == "Position")
+            {
+                CurPosTare += DoliPosition;
+                MyEdc.Tare.SetBasicTare(DoPE.SENSOR.SENSOR_S, DoPE.BASICTARE.SUBTRACT, CurPosTare);
+            }
+            else if (ctrl == "Load")
+            {
+                CurLoadTare += DoliLoad;
+                MyEdc.Tare.SetBasicTare(DoPE.SENSOR.SENSOR_F, DoPE.BASICTARE.SUBTRACT, CurLoadTare);
+            }
+        }
         #region Autopos
         public void AutoPosApproach()
         {
@@ -850,7 +906,7 @@ namespace DauBe_WTF.ViewModel.SubVM
             _tempDestination = DoliPosition + offset;
             double velLim = 100;
             //On remonte simplement le piston de 20mm
-            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
+            Error = MyEdc.Move.Pos(DoPE.CTRL.POS, velLim, _tempDestination, ref MyTan);
         }
 
         public void AutoPosFinal()
@@ -863,16 +919,17 @@ namespace DauBe_WTF.ViewModel.SubVM
         }
         #endregion
 
-        #region Move doli methods
+        #region Direct control doli methods
+        // Les méthodes moveUp et moveDown trigger "OnSftMsg". Les dépacement de limite sont gérés dans la méthode associée
         public void moveUp()
         {
-            double speed = Math.Abs(Velocity);
+            double speed = Math.Abs(ManualVelocity);
             Int32 i = MyEdc.DoPEDllHdl;
             DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.UP, DoPE.CTRL.POS, speed, ref MyTan);
 
             //Setup security load
-            double uprLim = Math.Abs(LimLoad);
-            double lwrLim = -1.0 * Math.Abs(LimLoad);
+            double uprLim = UpperLimLoad;
+            double lwrLim = LowerLimLoad;
             // When pressing up button, only risk is to apply to much tensile load. However in the case the user went to far while applying a
             // pressure load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
             // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
@@ -882,13 +939,13 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         public void moveDown()
         {
-            double speed = Math.Abs(Velocity);
+            double speed = Math.Abs(ManualVelocity);
             Int32 i = MyEdc.DoPEDllHdl;
             DoPE.ERR error = MyEdc.Move.FMove(DoPE.MOVE.DOWN, DoPE.CTRL.POS, speed, ref MyTan);
 
             //Setup security load
-            double uprLim = Math.Abs(LimLoad);
-            double lwrLim = -1.0 * Math.Abs(LimLoad);
+            double uprLim = UpperLimLoad;
+            double lwrLim = LowerLimLoad;
             // When pressing down button, only risk is to apply to much pressure. However in the case the user went to far while applying a
             // tensile load, if uprLim == -lwrLim, the error message saying to much load is applied will be triggered the first time this 
             // button is used. Multiplying it by five gives a load buffer to avoid that message. Keep in mind, there is still the max load defined
@@ -901,6 +958,82 @@ namespace DauBe_WTF.ViewModel.SubVM
             DoPE.ERR error = MyEdc.Move.Halt(DoPE.CTRL.POS, ref MyTan);
             // resets the sorftend limit in case it has been reached
             resetSft();
+        }
+        #endregion
+
+        #region Single doli operation
+        public void moveToDest()
+        {
+            // in case the user did not specify a speed
+            if (Velocity == 0)
+            {
+                Velocity = 1.0;
+            }
+            // On détermine quelle limite choisir
+            double limit = LowerLimLoad;
+            if (ManualCTRL == DoPE.CTRL.POS)
+            {
+                if (Destination > DoliPosition)
+                    limit = UpperLimLoad;
+            }
+            else
+                if (Destination > DoliLoad)
+                limit = UpperLimLoad;
+            DoPE.ERR error;
+            //on vérifie si on va dépasser la limite
+            bool prob = false;
+            // si même signe
+            if (DoliPosition / Destination < 0)
+            {
+                //si limite positive
+                if (limit > 0)
+                {
+                    if (Destination > limit)
+                        prob = true;
+                }
+                //si limite négative
+                else
+                    if (Destination < limit)
+                    prob = true;
+            }
+            else
+            {
+                if (Math.Abs(Destination) > Math.Abs(limit))
+                    prob = true;
+            }
+            if (ManualCTRL == DoPE.CTRL.LOAD)
+            {
+                if (prob)
+                {
+                    if (System.Windows.Forms.MessageBox.Show("The destination " + Destination + " exceeds the defined limit " + limit + ". Proceed with the movement ?", "", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    error = MyEdc.Move.Pos(ManualCTRL, Velocity, Destination, ref MyTan);
+                    Display(error.ToString());
+                }
+            }
+            else
+            {
+                error = MyEdc.Move.Pos(ManualCTRL, Velocity, Destination, ref MyTan);
+                Display(error.ToString());
+            }
+            //error = MyEdc.Move.PosExt(ManualCTRL, Velocity, DoPE.LIMITMODE.ABSOLUTE, Destination, DoPE.CTRL.LOAD, limit, DoPE.DESTMODE.DEST_POSITION, ref MyTan);
+            //// Special move in case position is used for destination. It sets a limit load to avoid problems
+            //if (controlMove == DoPE.CTRL.POS)
+            //{
+            //    // in this command, the limit and the destination have been inverted so the x-head is piloted using movement speed instead of loading speed (much
+            //    // faster). However, it means that if the limit load is reached, OnPosMsg will proc instead of OnLPosMsg
+            //    error = MyEdc.Move.PosExt(controlMove, Velocity, DoPE.LIMITMODE.ABSOLUTE, destination, DoPE.CTRL.LOAD, limit, DoPE.DESTMODE.APPROACH, ref MyTan);
+            //}
+            //else
+            //{
+            //    //MessageBox.Show("controlMove " + controlMove.ToString() + ", velocity " + velLim.ToString() + ", destination " + destination.ToString() + ", MyTan " + MyTan.ToString());           
+            //    error = MyEdc.Move.Pos(controlMove, Velocity, destination, ref MyTan);
+            //}
         }
         #endregion
 

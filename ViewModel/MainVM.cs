@@ -9,6 +9,7 @@ using DauBe_WTF.SecondaryWindows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using DauBe_WTF.CircularProgressBar;
 
 namespace DauBe_WTF.ViewModel
 {
@@ -18,9 +19,9 @@ namespace DauBe_WTF.ViewModel
         private InteractiveGraphUserControl.MVVM.ViewModel _ucVM;
         private SecondaryWindows.AutoPos.AutoPosVM _autopos;
         private SecondaryWindows.InputList.InputListVM _inputList;
+        private CPBVM _pg;
         private SubVM.DoliVM _doli;
         public SubVM.GraphVM graph { get; } = new SubVM.GraphVM();
-        public CircularProgressBar.CPBVM pg { get; } = new CircularProgressBar.CPBVM();
         #endregion
         #region Sub VM Properties
         public InteractiveGraphUserControl.MVVM.ViewModel UCVM
@@ -46,6 +47,13 @@ namespace DauBe_WTF.ViewModel
             get => _doli;
             set
             { _doli = value; OnPropertyChanged("Doli"); }
+        }
+
+        public CPBVM pg
+        {
+            get => _pg;
+            set
+            { _pg = value; OnPropertyChanged("pg"); }
         }
         #endregion
         #region Fields
@@ -78,13 +86,14 @@ namespace DauBe_WTF.ViewModel
             //Auto positioning windows
             autopos = new SecondaryWindows.AutoPos.AutoPosVM(pg,Doli);
             inputList = new SecondaryWindows.InputList.InputListVM(Doli);
+            pg = new CPBVM();
             AutoPosCommand = new RelayCommand(o => FireAutoPosWin());
             InputListCommand = new RelayCommand(o => FireInputListWin());
         }
 
         private void FireAutoPosWin()
         {
-            var autoPosWin = new SecondaryWindows.AutoPos.AutoPos();
+            var autoPosWin = new SecondaryWindows.AutoPos.AutoPos(Doli, pg);
             autoPosWin.Show();
         }
 

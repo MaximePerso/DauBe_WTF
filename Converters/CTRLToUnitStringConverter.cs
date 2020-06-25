@@ -16,7 +16,7 @@ namespace DauBe_WTF.Converters
             switch (ManualCTRL)
             {
                 case DoPE.CTRL.POS:
-                    return "Velocity (mm/s)";
+                    return "Velocity (mm/min)";
                 case DoPE.CTRL.LOAD:
                     return "Velocity (N/S)";
                 default:

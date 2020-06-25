@@ -17,6 +17,7 @@ using DauBe_WTF.ViewModel.SubVM;
 using Doli.DoPE;
 using System.Threading;
 using System.Windows.Threading;
+using System.Text.RegularExpressions;
 
 namespace DauBe_WTF
 {
@@ -84,6 +85,12 @@ namespace DauBe_WTF
             ((DauBe_WTF.ViewModel.MainVM)DataContext).Doli.ConnectToEdc();
             // Connect to EDC
             //ConnectToEdc();
+        }
+
+        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9.-]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
         #endregion
         //        #region TBC

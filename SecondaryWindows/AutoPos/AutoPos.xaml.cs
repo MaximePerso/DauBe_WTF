@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using DauBe_WTF.CircularProgressBar;
 using Doli.DoPE;
 
 namespace DauBe_WTF.SecondaryWindows.AutoPos
@@ -21,9 +22,9 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
     public partial class AutoPos : Window
     {
         private ViewModel.SubVM.DoliVM _doli;
-        private CircularProgressBar.CPBVM _pg;
+        private CPBVM _pg;
 
-        public AutoPos()
+        public AutoPos(ViewModel.SubVM.DoliVM _doli, CPBVM _pg)
         {
             InitializeComponent();
             this.DataContext = new AutoPosVM(_pg,_doli);
