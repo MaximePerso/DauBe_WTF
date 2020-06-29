@@ -33,7 +33,7 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
 
         #region Properties
         private CircularProgressBar.CPBVM _pg;
-        private ViewModel.SubVM.DoliVM _doli { get; }
+        private ViewModel.SubVM.DoliVM _doli;
         public CPBVM pg
         {
             get => _pg;

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using GS = GalaSoft.MvvmLight.Command;
-using IGUC = InteractiveGraphUserControl.MVVM;
+using IG_gridGraphDC = InteractiveGraphUserControl.MVVM;
 using DauBe_WTF.Utility;
 using InteractiveGraphUserControl.Utility;
 using System.Windows.Forms;
@@ -15,38 +15,46 @@ namespace DauBe_WTF.SecondaryWindows.InputList
     public class InputListVM : VMBase
     {
         #region Usercontrol property
-        private IGUC.ViewModel _uc;
-        public IGUC.ViewModel UC
+        private IG_gridGraphDC.ViewModel _gridGraphDC;
+        public IG_gridGraphDC.ViewModel GridGraphDC
         {
-            get => _uc;
+            get => _gridGraphDC;
             set
-            { 
-                _uc = value;
-                OnPropertyChanged("UC");
-            }
+            { _gridGraphDC = value; OnPropertyChanged("GridGraphUC"); }
         }
         #endregion
 
         private double _tmpLoad = 0;
         private double _tmpPos = 0;
         private bool _isDoliBusy;
-
-        private ViewModel.SubVM.DoliVM _doli { get; }
-
         private IView view;
+        
+        public ICommand test { get; set; }
 
-        public InputListVM(ViewModel.SubVM.DoliVM doli )
+        private ViewModel.SubVM.DoliVM _doli;
+
+        public InputListVM(ViewModel.SubVM.DoliVM doli)
         {
+            _doli = doli;
             _isDoliBusy = false;
-            UC = new IGUC.ViewModel(view);
+            _gridGraphDC = new IG_gridGraphDC.ViewModel(view);
+            test = new RelayCommand(o => coucou());
         }
 
         private bool ProcessSummary()
         {
-            if (MessageBox.Show("Vous vous apprêtez à lancer une séquence de " + UC.DoliInputCollection.Count() + " commandes. La durée des opérations est estimée à " + UC.DestPosSeriesValues.Last().X + " secondes", "",MessageBoxButtons.OKCancel) == DialogResult.OK)
+            if (_gridGraphDC.NbCycle == 0)
+                _gridGraphDC.NbCycle = 1;
+            if (MessageBox.Show("Vous vous apprêtez à lancer  séquence de " + _gridGraphDC.DoliInputCollection.Count() * _gridGraphDC.NbCycle + " commandes. La durée des opérations est estimée à " + _gridGraphDC.DestPosSeriesValues.Last().X + " secondes", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                //if (MessageBox.Show("Vous vous apprêtez à lancer une séquence de commandes. La durée des opérations est estimée à secondes", "",MessageBoxButtons.OKCancel) == DialogResult.OK)
                 return true;
             else
                 return false;
+        }
+
+        private void coucou()
+        {
+            Console.WriteLine(_gridGraphDC.DestPosSeriesValues);
         }
 
         private GS.RelayCommand _complexCycle;
@@ -60,8 +68,10 @@ namespace DauBe_WTF.SecondaryWindows.InputList
                            {
                                _isDoliBusy = true;
                                if (ProcessSummary())
-                                   _doli.ComplexeCycle(UC.NbCycle, UC.DoliInputCollection);
-                               await DoliMovement();
+                                   _doli.ComplexeCycle(_gridGraphDC.NbCycle, _gridGraphDC.DoliInputCollection);
+                               else
+                                   _isDoliBusy = false;
+                               //await DoliMovement();
                                _complexCycle.RaiseCanExecuteChanged();
                            }, () => { return !_isDoliBusy; }));
             }

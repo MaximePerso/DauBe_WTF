@@ -25,8 +25,7 @@ namespace DauBe_WTF.ViewModel.SubVM
     public class DoliVM : VMBase
     {
         #region Private Field with no Property
-        #region AutoPos
-        #endregion
+        private double _preTaredLoad;
         #endregion
 
         #region MVVM AREA
@@ -892,10 +891,15 @@ namespace DauBe_WTF.ViewModel.SubVM
         #region Autopos
         public void AutoPosApproach()
         {
+            //On tare le chargement pour que la charge appliquée sur la balle soit toujours la même indépendamment de l'outillage. On Garde en même la valeur tarer pour la resortir 
+            // à la fin de la mise en place de la X-head
+            CurLoadTare += DoliLoad;
+            _preTaredLoad = DoliLoad;
+            MyEdc.Tare.SetTare(DoPE.SENSOR.SENSOR_F, CurLoadTare);
             double velLim = 100; //Deplacement de la X-head à 100 mm/s
             _tempLim = -100; //Limite de position (mm) qui ne sera jamais atteinte, mais demandée par PosExt
-            _tempDestination = -1000; //Destination visée par la Xhead -1000N (compression)
-            //On déplace le piston à 100mm/s jusqu'à ce qu'une force de -1000N soit enregistrée (ou que sa position soit arrivée à -100 mm)
+            _tempDestination = -400; //Destination visée par la Xhead -400N (compression)
+            //On déplace le piston à 100mm/s jusqu'à ce qu'une force de -400N soit enregistrée (ou que sa position soit arrivée à -100 mm)
             Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
         }
 
@@ -911,6 +915,9 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         public void AutoPosFinal()
         {
+            // On détare
+            CurLoadTare -= -_preTaredLoad;
+            MyEdc.Tare.SetTare(DoPE.SENSOR.SENSOR_F, CurLoadTare);
             _tempLim = -100;
             _tempDestination = DoliPosition - _squishedBall;
             double velLim = 5;
@@ -1041,7 +1048,8 @@ namespace DauBe_WTF.ViewModel.SubVM
         public void ComplexeCycle(int NbCycles, ObservableCollection<DoliInput> DoliInputCollection)
         {
             //start complexe movement
-            Error = MyEdc.Combined.StartCMD(NbCycles, DoPE.CMD_MODE.MESSAGE);
+            //Error = MyEdc.Combined.StartCMD(NbCycles, DoPE.CMD_MODE.MESSAGE);
+            Log.LogWrite("Beginning combined sequence : nb cycles = " + NbCycles, "Command");
             //execute list of commands
             foreach (var input in DoliInputCollection)
             {
@@ -1068,12 +1076,12 @@ namespace DauBe_WTF.ViewModel.SubVM
 
                     if (input.MoveCtrl == "Halt")
                     {
-                        MyEdc.Move.HaltW(destCTRL, input.Speed, ref MyTan);
+                        //MyEdc.Move.HaltW(destCTRL, input.Speed, ref MyTan);
                         Log.LogWrite("Halt command: DestCtrl = " + input.DestCtrl + ", waiting time = " + input.Speed + "s.", "Command");
                     }
                     else
                     {
-                        MyEdc.Move.PosExt(moveCTRL, input.Speed, limMode, input.Limit, destCTRL, input.Destination, destMode, ref MyTan);
+                        //MyEdc.Move.PosExt(moveCTRL, input.Speed, limMode, input.Limit, destCTRL, input.Destination, destMode, ref MyTan);
                         Log.LogWrite("Move commnad: MoveCtrl = " + input.MoveCtrl + ", speed = " + input.Speed + "unit, LimMode = " + input.LimMode +
                             ", Limit = " + input.Limit + "unit, DestCtrl = " + input.DestCtrl + ", Destination = " + input.Destination +
                             ", DestMode = " + input.DestMode, "Command");
@@ -1082,11 +1090,12 @@ namespace DauBe_WTF.ViewModel.SubVM
                 catch
                 {
                     Log.LogWrite("Error during a ComplexCyle. Input numbre : " + input.SequenceNumber, "Error");
-                    DoPE.ERR error = MyEdc.Move.Halt(DoPE.CTRL.POS, ref MyTan);
+                    //DoPE.ERR error = MyEdc.Move.Halt(DoPE.CTRL.POS, ref MyTan);
                 }
             }
             //stop complex movement
-            Error = MyEdc.Combined.EndCMD(DoPE.CMD_OPERATION.START);
+            //Error = MyEdc.Combined.EndCMD(DoPE.CMD_OPERATION.START);
+            Log.LogWrite("End of the combined sequence", "Command");
         }
 
         #endregion

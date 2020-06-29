@@ -85,7 +85,7 @@ namespace DauBe_WTF.ViewModel
             UCVM = new InteractiveGraphUserControl.MVVM.ViewModel(view);
             //Auto positioning windows
             autopos = new SecondaryWindows.AutoPos.AutoPosVM(pg,Doli);
-            inputList = new SecondaryWindows.InputList.InputListVM(Doli);
+            //inputList = new SecondaryWindows.InputList.InputListVM(Doli, UCVM);
             pg = new CPBVM();
             AutoPosCommand = new RelayCommand(o => FireAutoPosWin());
             InputListCommand = new RelayCommand(o => FireInputListWin());
@@ -99,7 +99,7 @@ namespace DauBe_WTF.ViewModel
 
         private void FireInputListWin()
         {
-            var inputListWin = new SecondaryWindows.InputList.InputLitst();
+            var inputListWin = new SecondaryWindows.InputList.InputLitst(Doli);
             inputListWin.Show();
         }
     }
