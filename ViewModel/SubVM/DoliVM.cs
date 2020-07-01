@@ -37,6 +37,7 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         #region Log object
         WriteLog Log = new WriteLog("DoliLog", "world");
+        SweetSweetCSV csv = new SweetSweetCSV();
         #endregion
 
         #region Fields
@@ -414,6 +415,9 @@ namespace DauBe_WTF.ViewModel.SubVM
 
                 // open the first EDC found on this PC
                 MyEdc = new Edc(DoPE.OpenBy.DeviceId, SensorId);
+
+                //allows to follow a cycle command progress
+                MyEdc.Data.SetCycleMode(true);
 
                 // hang in event-handler to receive DoPE-events
                 MyEdc.Eh.OnLineHdlr += new DoPE.OnLineHdlr(OnLine);
@@ -1031,72 +1035,42 @@ namespace DauBe_WTF.ViewModel.SubVM
         public void Cycles(string MoveCtrl, double Speed1, double Dest1, double Halt1, double Speed2, double Dest2, double Halt2, int Cycles, double Speed, double Destination)
         {
             DoPE.CTRL moveCtrl = DoPE.CTRL.POS;
+            DoPE.CTRL2 isCyclign = ;
             if (MoveCtrl == "Load")
                 moveCtrl = DoPE.CTRL.LOAD;
             DoPE.ERR error =  MyEdc.Move.Cycle(moveCtrl, Speed1, Dest1, Halt1, Speed2, Dest2, Halt2, Cycles, Speed, Destination, ref MyTan);
             Display(error.ToString());
             Log.LogWrite("Cycles command : " + MoveCtrl + ", " + Speed1 + ", " + Dest1 + ", " + Halt1 + ", " + Speed2 + ", " + Dest2 + ", " + Halt2 + ", " + Cycles + ", " + Speed + ", " + Destination + ", " + MyTan, "Command") ;
-            MyEdc
+            while (isCyclign == DoPE.CTRL2.CYCLES_ACTIVE)
+            {
+                timeList.Add(DoliTime);
+                positionList.Add(DoliPosition);
+                loadList.Add(DoliLoad);
+                extendList.Add(DoliExtend);
+            }
         }
         #endregion
 
-        private void btnRecord_Click(object sender, EventArgs e)
+
+
+        #region Async function
+        private async Task CycleCompletion(DoPE.CTRL2 isCycleActive)
         {
+            resetList();
+            await Task.Run(() =>
+            {
+                while(isCycleActive == DoPE.CTRL2.CYCLES_ACTIVE)
+                {
+                    timeList.Add(DoliTime);
+                    positionList.Add(DoliPosition);
+                    loadList.Add(DoliLoad);
+                    extendList.Add(DoliExtend);
+                }
+            });
 
-            ////Wipe de list to start frech recording
-            //ResetList();
+            csv.WriteCSV(timeList, positionList, loadList, extendList, "Cycle");
         }
-
-
-        private void btnGraph_Click(object sender, EventArgs e)
-        {
-
-            //var thread = new Thread(() =>
-            //{
-            ////    var liveChart = new RealTimeChart(ListData);
-            ////    Application.Run(liveChart);
-
-            //    NewINstanceOfChart = new RealTimeChart(ListData);
-            //    NewINstanceOfChart.Show();
-            //});
-            ////thread.SetApartmentState(ApartmentState.STA);
-            //thread.Start();
-            ////NewINstanceOfChart = new RealTimeChart(ListData);
-            ////NewINstanceOfChart.Show();
-        }
-
-        private void btnPos_Click(object sender, EventArgs e)
-        {
-            //var calibration = new Calibration(MyEdc, MyTan, ListData);
-            //calibration.Show();
-        }
-
-        private void btnGraph_Click(object sender, RoutedEventArgs e)
-        {
-            //NewINstanceOfChart2 = new RealTimeCharts();
-            //NewINstanceOfChart2.Show();
-            //    var thread = new Thread(() =>
-            //    {
-            //        NewINstanceOfChart2 = new RealTimeCharts();
-            //        NewINstanceOfChart2.Show();
-
-            //        // to ensure no ghost thread is left when closing the program
-            //        NewINstanceOfChart2.Closed += (sendr2, e2) =>
-            //        NewINstanceOfChart2.Dispatcher.InvokeShutdown();
-            //    Dispatcher.Run();
-            //});
-
-            //    thread.SetApartmentState(ApartmentState.STA);
-            //    thread.Start();
-            //    //realTimeChart.ShowDialog();
-        }
-
-        private void guiOn(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-
+        #endregion
 
     }
 }

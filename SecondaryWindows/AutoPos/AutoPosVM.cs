@@ -185,7 +185,7 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
                                     Step2Foreground = Brushes.Green;
                                     Step3Foreground = Brushes.Orange;
                                     _pg.Loading2Opacity = 1;
-                                    await AsyncAutoPosFinal(_doli, _pg);
+                                    await AsyncAutoPosFinal(_doli);
                                     Instructions = "Le piston est en place !";
                                     Step3Foreground = Brushes.Green;
                                     _pg.Loading2Opacity = 0;
@@ -199,22 +199,7 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
             }
         }
 
-        public async Task pouetpouet()
-        {
-            await Task.Run(() =>
-            {
-                int i = 0;
-                while (i < 101)
-                {
-                    _pg.ProgressValue = i;
-                    Thread.Sleep(20);
-                    i++;
-                }
-                _pg.ProgressValue = 0;
-            });
-        }
-
-        public async Task AsyncAutoPosFinal(ViewModel.SubVM.DoliVM _doli, CPBVM _pg)
+        public async Task AsyncAutoPosFinal(ViewModel.SubVM.DoliVM _doli)
         {
             pg.ProgressValue = 0;
             // On replace le piston à sa place basse

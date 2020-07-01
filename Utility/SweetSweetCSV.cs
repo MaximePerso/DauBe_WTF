@@ -15,6 +15,11 @@ namespace DauBe_WTF.Utility
         private string _exePath = string.Empty;
         private String _todaysdate = string.Empty;
 
+        public SweetSweetCSV()
+        {
+
+        }
+
         public void WriteCSV(List<double> time, List<double> position, List<double> load, List<double> extend, string command)
         {
             CheckFolder();
