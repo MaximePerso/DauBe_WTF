@@ -26,6 +26,11 @@ namespace DauBe_WTF.ViewModel.SubVM
     {
         #region Private Field with no Property
         private double _preTaredLoad;
+        private GraphVM _graph;
+        private List<double> timeList = new List<double>();
+        private List<double> positionList = new List<double>();
+        private List<double> loadList = new List<double>();
+        private List<double> extendList = new List<double>();
         #endregion
 
         #region MVVM AREA
@@ -349,16 +354,17 @@ namespace DauBe_WTF.ViewModel.SubVM
         ///  List of globals to acces measured values
         /// </summary>
         // Loading variables
-        public Globals ListData = new Globals();
         //private RealTimeChart NewINstanceOfChart;
         private GraphVM NewINstanceOfChart;
         //private RealTimeCharts NewINstanceOfChart2;
         public delegate void update(double time, double position, double load, double extension);
 
+        public DoliVM() { }
 
-        public DoliVM()
+        public DoliVM(GraphVM graph)
         {
             Initialisation();
+            _graph = graph;
             //ConnectToEdc();
         }
 
@@ -369,7 +375,7 @@ namespace DauBe_WTF.ViewModel.SubVM
             DoPEItems = Enum.GetNames(typeof(DoPE.CTRL));
             //Doli param
             _isDoliOn = false;
-            _squishedBall = 25;
+            _squishedBall = 45;
             _upperLimLoad = 1000;
             _lowerLimLoad = -1000;
             _manualVelocity = 10;
@@ -465,6 +471,14 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         #endregion
 
+        #region Disconnect
+        public void Disconnect()
+        {
+            DoPE.ERR error = MyEdc.Move.Off();
+        }
+
+        #endregion
+
         #region GUI
 
         ///----------------------------------------------------------------------
@@ -489,8 +503,8 @@ namespace DauBe_WTF.ViewModel.SubVM
         ///----------------------------------------------------------------------
         private void Display(string Text)
         {
-            TextDisplay += Text;
-            Console.WriteLine(TextDisplay);
+            TextDisplay += Text + "\n";
+            Log.LogWrite(Text, "CommandOutput");
             //guiDebug.AppendText(Text);
             //guiDebug.UpdateLayout();
         }
@@ -541,10 +555,6 @@ namespace DauBe_WTF.ViewModel.SubVM
             DoPE.Data Sample = Data.Data;
 
             // Live data
-            ListData.OnDataTime = Sample.Time;
-            ListData.OnDataPosition = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S];
-            ListData.OnDataLoad = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F];
-            ListData.OnDataExtend = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E];
 
             if (Data.DoPError == DoPE.ERR.NOERROR)
             {
@@ -554,10 +564,6 @@ namespace DauBe_WTF.ViewModel.SubVM
                 {
 
                     // Send the data from the ondata handler inside of a global list
-                    ListData.time.Add(Sample.Time);
-                    ListData.position.Add(Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S]);
-                    ListData.load.Add(Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F]);
-                    ListData.extend.Add(Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E]);
 
                     //update pass = new update(NewINstanceOfChart.UpdateValues);
                     //pass(ListData.time.Last(), ListData.position.Last(), ListData.load.Last(), ListData.extend.Last());
@@ -569,6 +575,8 @@ namespace DauBe_WTF.ViewModel.SubVM
                     DoliPosition = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_S];
                     DoliLoad = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_F];
                     DoliExtend = Sample.Sensor[(int)DoPE.SENSOR.SENSOR_E];
+
+                    _graph.UpdateGraph(DoliTime, DoliPosition, DoliLoad, DoliExtend);
                 }
             }
             return 0;
@@ -743,59 +751,13 @@ namespace DauBe_WTF.ViewModel.SubVM
 
         #endregion
 
-        #region TEST CODE
-        private void guiControl_SelectedIndexChanged(object sender, EventArgs e)
+        private void resetList()
         {
-            DoPE.CTRL control = SelectedMoveCTRL;
-            /*
-            switch (control)
-            {
-                case DoPE.CTRL.POS:
-                    lblUnits.Content = "mm";
-                    lblDestination.Content = "Position";
-                    velUnits.Content = "mm/s";
-                    /// reset values to limit missclicks
-                    destination.Text = "0";
-                    break;
-                case DoPE.CTRL.LOAD:
-                    lblUnits.Content = "N";
-                    lblDestination.Content = "Load";
-                    velUnits.Content = "N/s";
-                    /// reset values to limit missclicks
-                    destination.Text = "0";
-                    break;
-                case DoPE.CTRL.EXTENSION:
-                    lblUnits.Content = "mm";
-                    lblDestination.Content = "Extension";
-                    /// reset values to limit missclicks
-                    destination.Text = "0";
-                    break;
-                default:
-                    lblUnits.Content = "mm";
-                    lblDestination.Content = "Position";
-                    velUnits.Content = "mm/s";
-                    /// reset values to limit missclicks
-                    destination.Text = "0";
-                    break;
-            }*/
+            timeList.Clear();
+            positionList.Clear();
+            loadList.Clear();
+            extendList.Clear();
         }
-        private double noProblemJeanClaude(String chiant)
-        {
-            double moinsChiant;
-
-            if (chiant.Contains(".")) { moinsChiant = Convert.ToDouble(chiant.Replace(".", ",")); }
-            else { moinsChiant = Convert.ToDouble(chiant); }
-
-            return moinsChiant;
-        }
-
-        private void Myevent(DoPE.Data MyData, object Parameter)
-        {
-            Display(MyData.Sensor[0].ToString());
-
-        }
-
-
 
         private void resetSft()
         // function used to reset softend for the user to be able to send other command from the window
@@ -804,51 +766,6 @@ namespace DauBe_WTF.ViewModel.SubVM
             double lwrLim = LowerLimLoad * 5.0;
             DoPE.ERR error2 = MyEdc.Ctrl.Sft(DoPE.CTRL.LOAD, uprLim, lwrLim, DoPE.REACT.STATUS);
         }
-
-
-
-        private void ResetList()
-        {
-            ListData.time.Clear();
-            ListData.position.Clear();
-            ListData.load.Clear();
-            ListData.extend.Clear();
-        }
-
-        private void UpdateChart()
-        {
-
-        }
-        #endregion
-
-        //#region BUTTON ACTION
-
-        //private void upBut_MouseDown(object sender, MouseEventArgs e)
-        //{
-        //    // in case the user did not specify a speed
-        //    if (DefaultVel == 0)
-        //    {
-        //        DefaultVel = 1.0;
-        //    }
-        //    moveUp();
-        //}
-
-        //private void _MouseUp(object sender, MouseEventArgs e)
-        //{
-        //    stop();
-        //}
-
-        //private void downBut_MouseDown(object sender, EventArgs e)
-        //{
-        //    // in case the user did not specify a speed
-        //    if (DefaultVel == 0)
-        //    {
-        //        DefaultVel = 1.0;
-        //    }
-        //    moveDown();
-        //}
-
-        //#endregion
 
         #region Start Doli
         //private void DoliGo()
@@ -873,7 +790,6 @@ namespace DauBe_WTF.ViewModel.SubVM
                 MyEdc.Tare.SetTare(DoPE.SENSOR.SENSOR_F, CurLoadTare);
             }
         }
-        #endregion
 
         private void BasicTare(string ctrl)
         {
@@ -888,6 +804,8 @@ namespace DauBe_WTF.ViewModel.SubVM
                 MyEdc.Tare.SetBasicTare(DoPE.SENSOR.SENSOR_F, DoPE.BASICTARE.SUBTRACT, CurLoadTare);
             }
         }
+        #endregion
+
         #region Autopos
         public void AutoPosApproach()
         {
@@ -897,20 +815,28 @@ namespace DauBe_WTF.ViewModel.SubVM
             _preTaredLoad = DoliLoad;
             MyEdc.Tare.SetTare(DoPE.SENSOR.SENSOR_F, CurLoadTare);
             double velLim = 100; //Deplacement de la X-head à 100 mm/s
-            _tempLim = -100; //Limite de position (mm) qui ne sera jamais atteinte, mais demandée par PosExt
+            double _tempDestIni = -100; //première consigne pour eviter que la Xhead n'aille trop loin quand ele part à pleine vitesse
+            _tempLim = -1000; //Limite de position (mm) qui ne sera jamais atteinte, mais demandée par PosExt
             _tempDestination = -400; //Destination visée par la Xhead -400N (compression)
-            //On déplace le piston à 100mm/s jusqu'à ce qu'une force de -400N soit enregistrée (ou que sa position soit arrivée à -100 mm)
-            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
+            //On déplace le piston à 100mm/s jusqu'à ce qu'une force de -40N soit enregistrée (ou que sa position soit arrivée à -1000 mm). On s'arrête avant les -400, car le piston va super vite et risque de le manquer de beaucoup
+            Error = MyEdc.Combined.StartCMD(1, DoPE.CMD_MODE.MESSAGE);
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.NOT_ACTIVE, 0, DoPE.CTRL.LOAD, _tempDestIni, DoPE.DESTMODE.DEST_POSITION, ref MyTan);
+            Display(Error.ToString());
+            //On déplace le piston jusqu'à la seconde valeur cible
+            Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, 5, DoPE.LIMITMODE.NOT_ACTIVE, 0, DoPE.CTRL.LOAD, _tempDestination, DoPE.DESTMODE.APPROACH, ref MyTan);
+            Display(Error.ToString());
+            Error = MyEdc.Combined.EndCMD(DoPE.CMD_OPERATION.START);
         }
 
         public void AutoPosBallRelease()
         {
-            double offset = 20.0; // offset permettant de remonter la Xhead de 20mm
+            double offset = 40.0; // offset permettant de remonter la Xhead de 20mm
             _tempLim = 150;
             _tempDestination = DoliPosition + offset;
             double velLim = 100;
             //On remonte simplement le piston de 20mm
             Error = MyEdc.Move.Pos(DoPE.CTRL.POS, velLim, _tempDestination, ref MyTan);
+            Display(Error.ToString());
         }
 
         public void AutoPosFinal()
@@ -923,6 +849,7 @@ namespace DauBe_WTF.ViewModel.SubVM
             double velLim = 5;
             // On replace le piston à sa place basse
             Error = MyEdc.Move.PosExt(DoPE.CTRL.POS, velLim, DoPE.LIMITMODE.ABSOLUTE, _tempDestination, DoPE.CTRL.LOAD, _tempLim, DoPE.DESTMODE.APPROACH, ref MyTan);
+            Display(Error.ToString());
         }
         #endregion
 
@@ -1098,6 +1025,19 @@ namespace DauBe_WTF.ViewModel.SubVM
             Log.LogWrite("End of the combined sequence", "Command");
         }
 
+        #endregion
+
+        #region Cycles
+        public void Cycles(string MoveCtrl, double Speed1, double Dest1, double Halt1, double Speed2, double Dest2, double Halt2, int Cycles, double Speed, double Destination)
+        {
+            DoPE.CTRL moveCtrl = DoPE.CTRL.POS;
+            if (MoveCtrl == "Load")
+                moveCtrl = DoPE.CTRL.LOAD;
+            DoPE.ERR error =  MyEdc.Move.Cycle(moveCtrl, Speed1, Dest1, Halt1, Speed2, Dest2, Halt2, Cycles, Speed, Destination, ref MyTan);
+            Display(error.ToString());
+            Log.LogWrite("Cycles command : " + MoveCtrl + ", " + Speed1 + ", " + Dest1 + ", " + Halt1 + ", " + Speed2 + ", " + Dest2 + ", " + Halt2 + ", " + Cycles + ", " + Speed + ", " + Destination + ", " + MyTan, "Command") ;
+            MyEdc
+        }
         #endregion
 
         private void btnRecord_Click(object sender, EventArgs e)

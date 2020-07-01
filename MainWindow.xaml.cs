@@ -53,7 +53,6 @@ namespace DauBe_WTF
         ///  List of globals to acces measured values
         /// </summary>
         // Loading variables
-        public Globals ListData = new Globals();
         //private RealTimeChart NewINstanceOfChart;
         private GraphVM NewINstanceOfChart;
         //private RealTimeCharts NewINstanceOfChart2;
@@ -91,6 +90,11 @@ namespace DauBe_WTF
         {
             Regex regex = new Regex("[^0-9.-]+");
             e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Environment.Exit(0);
         }
         #endregion
         //        #region TBC
