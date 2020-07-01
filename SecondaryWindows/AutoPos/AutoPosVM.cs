@@ -235,8 +235,9 @@ namespace DauBe_WTF.SecondaryWindows.AutoPos
             Console.WriteLine("DoliLoad = " + _doli.DoliLoad + ", TempLim = " + _doli.TempLim);
             await Task.Run(() =>
             {
-                while (Math.Abs(_doli.TempLim - _doli.DoliLoad) > 10)
+                while (Math.Abs(_doli.TempDestination - _doli.DoliLoad) > 40)
                 {
+                    Console.WriteLine("DoliLoad = " + _doli.DoliLoad + ", TempLim = " + _doli.TempLim);
                     System.Threading.Thread.Sleep(250);
                 }
             });

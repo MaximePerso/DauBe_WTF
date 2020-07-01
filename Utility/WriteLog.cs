@@ -24,7 +24,7 @@ namespace DauBe_WTF.Utility
                 {
                     using (StreamWriter w = File.AppendText(m_exePath + "\\" + fileName))
                     {
-                        Log(logMessage, w);
+                        Log(logMessage, w, TypeOfMessage);
                     }
                 }
             }
@@ -33,16 +33,25 @@ namespace DauBe_WTF.Utility
             }
         }
 
-        public void Log(string logMessage, TextWriter txtWriter)
+        public void Log(string logMessage, TextWriter txtWriter, string TypeOfMessage)
         {
             try
             {
-                txtWriter.Write("\r\nLog Entry : ");
-                txtWriter.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
-                    DateTime.Now.ToLongDateString());
-                txtWriter.WriteLine("  :");
-                txtWriter.WriteLine("  :{0}", logMessage);
-                txtWriter.WriteLine("-------------------------------");
+                if (TypeOfMessage == "CommandOutput")
+                {
+                    txtWriter.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
+                        DateTime.Now.ToLongDateString());
+                    txtWriter.WriteLine("  :{0}", logMessage);
+                }
+                else
+                {
+                    txtWriter.Write("\r\nLog Entry : ");
+                    txtWriter.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
+                        DateTime.Now.ToLongDateString());
+                    txtWriter.WriteLine("  :");
+                    txtWriter.WriteLine("  :{0}", logMessage);
+                    txtWriter.WriteLine("-------------------------------");
+                }
             }
             catch (Exception ex)
             {

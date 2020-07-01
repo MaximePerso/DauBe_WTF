@@ -21,7 +21,7 @@ namespace DauBe_WTF.ViewModel
         private SecondaryWindows.InputList.InputListVM _inputList;
         private CPBVM _pg;
         private SubVM.DoliVM _doli;
-        public SubVM.GraphVM graph { get; } = new SubVM.GraphVM();
+        private SubVM.GraphVM _graph;
         #endregion
         #region Sub VM Properties
         public InteractiveGraphUserControl.MVVM.ViewModel UCVM
@@ -55,8 +55,15 @@ namespace DauBe_WTF.ViewModel
             set
             { _pg = value; OnPropertyChanged("pg"); }
         }
-        #endregion
-        #region Fields
+
+        public SubVM.GraphVM Graph
+        {
+            get => _graph;
+            set
+            { _graph = value; OnPropertyChanged("Graph"); }
+        }
+    #endregion
+    #region Fields
         private bool _isDoliBusy;
         #endregion
         #region Properties
@@ -70,6 +77,7 @@ namespace DauBe_WTF.ViewModel
         #region Commands
         public ICommand AutoPosCommand { get; set; }
         public ICommand InputListCommand { get; set; }
+        public ICommand CyclesCommand { get; set; }
         public IAsyncCommand OkCommand { get; set; }
         public ICommand MoveUpCommand { get; set; }
         public ICommand MoveDownCommand { get; set; }
@@ -78,8 +86,10 @@ namespace DauBe_WTF.ViewModel
 
         public MainVM()
         {
+            //Graph
+            Graph = new SubVM.GraphVM();
             //DOli
-            Doli = new SubVM.DoliVM();
+            Doli = new SubVM.DoliVM(Graph);
             Doli.ConnectToEdc();
             //Gridgraph usercontrol
             UCVM = new InteractiveGraphUserControl.MVVM.ViewModel(view);
@@ -89,6 +99,7 @@ namespace DauBe_WTF.ViewModel
             pg = new CPBVM();
             AutoPosCommand = new RelayCommand(o => FireAutoPosWin());
             InputListCommand = new RelayCommand(o => FireInputListWin());
+            CyclesCommand = new RelayCommand(o => FireCyclesWin());
         }
 
         private void FireAutoPosWin()
@@ -101,6 +112,12 @@ namespace DauBe_WTF.ViewModel
         {
             var inputListWin = new SecondaryWindows.InputList.InputLitst(Doli);
             inputListWin.Show();
+        }
+
+        private void FireCyclesWin()
+        {
+            var cyclesWin = new SecondaryWindows.Cycles.Cycles(Doli);
+            cyclesWin.Show();
         }
     }
 }
