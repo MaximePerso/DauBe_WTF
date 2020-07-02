@@ -23,11 +23,17 @@ namespace DauBe_WTF.Utility
         public void WriteCSV(List<double> time, List<double> position, List<double> load, List<double> extend, string command)
         {
             CheckFolder();
-            string timeNow = DateTime.Now.ToString("t");
+            string timeNow = DateTime.Now.ToString("HH_mm");
             using (var writer = new StreamWriter(_exePath + "\\Records\\" + _todaysdate + "\\" + command + "_" + timeNow + ".csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            //using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                csv.WriteRecords(Matrix(time, position, load, extend));
+                //csv.Configuration.Delimiter = ";";
+                var MyList = Matrix(time, position, load, extend);
+                foreach (var item in MyList)
+                {
+                    writer.WriteLine(item);
+                }
+                writer.Flush();
             }
         }
 
@@ -48,11 +54,11 @@ namespace DauBe_WTF.Utility
 
         private List<string> Matrix(List<double> time, List<double> position, List<double> load, List<double> extend)
         {
-            List<string> MyList = new List<string>();
-            MyList.Add("Time,Position,Load,Extend");
-            for(int i =0; i<position.Count(); i++)
+            List<string> MyList = new List<string>{"Time;Position;Load;Extend"};
+            for (int i =0; i<position.Count(); i++)
             {
-                MyList.Add(time[i].ToString() + "," + position[i].ToString() + "," + load[i].ToString() + "," + extend[i].ToString());
+                MyList.Add(time[i].ToString() + ";" + position[i].ToString() + ";" + load[i].ToString() + ";" + extend[i].ToString());
+                //MyList.Add(new List<string> { time[i].ToString(), position[i].ToString(), load[i].ToString(), extend[i].ToString() + "\n" });
             }
             return MyList;
         }

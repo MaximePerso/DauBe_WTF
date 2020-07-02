@@ -29,7 +29,7 @@ namespace DauBe_WTF.SecondaryWindows.InputList
         private bool _isDoliBusy;
         private IView view;
         
-        public ICommand test { get; set; }
+        public ICommand ComplexCycleCommand { get; set; }
 
         private ViewModel.SubVM.DoliVM _doli;
 
@@ -38,60 +38,60 @@ namespace DauBe_WTF.SecondaryWindows.InputList
             _doli = doli;
             _isDoliBusy = false;
             _gridGraphDC = new IG_gridGraphDC.ViewModel(view);
-            test = new RelayCommand(o => coucou());
+            ComplexCycleCommand = new RelayCommand(o => ComplexeCycle(), o=> { return !_doli.isDoliBusy; });
         }
 
         private bool ProcessSummary()
         {
             if (_gridGraphDC.NbCycle == 0)
                 _gridGraphDC.NbCycle = 1;
-            if (MessageBox.Show("Vous vous apprêtez à lancer  séquence de " + _gridGraphDC.DoliInputCollection.Count() * _gridGraphDC.NbCycle + " commandes. La durée des opérations est estimée à " + _gridGraphDC.DestPosSeriesValues.Last().X + " secondes", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
+            if (MessageBox.Show("La durée des opérations est estimée à " + _gridGraphDC.DestPosSeriesValues.Last().X + " secondes", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
                 //if (MessageBox.Show("Vous vous apprêtez à lancer une séquence de commandes. La durée des opérations est estimée à secondes", "",MessageBoxButtons.OKCancel) == DialogResult.OK)
                 return true;
             else
                 return false;
         }
 
-        private void coucou()
+        private void ComplexeCycle()
         {
-            Console.WriteLine(_gridGraphDC.DestPosSeriesValues);
+            if(ProcessSummary())
+                _doli.ComplexeCycle(_gridGraphDC.NbCycle, _gridGraphDC.DoliInputCollection);
         }
-
-        private GS.RelayCommand _complexCycle;
-        public GS.RelayCommand ComplexCycle
-        {
-            get
-            {
-                return _complexCycle
-                       ?? (_complexCycle = new GS.RelayCommand(
-                           async () =>
-                           {
-                               _isDoliBusy = true;
-                               if (ProcessSummary())
-                                   _doli.ComplexeCycle(_gridGraphDC.NbCycle, _gridGraphDC.DoliInputCollection);
-                               else
-                                   _isDoliBusy = false;
-                               //await DoliMovement();
-                               _complexCycle.RaiseCanExecuteChanged();
-                           }, () => { return !_isDoliBusy; }));
-            }
+        //private GS.RelayCommand _complexCycle;
+        //public GS.RelayCommand ComplexCycle
+        //{
+        //    get
+        //    {
+        //        return _complexCycle
+        //               ?? (_complexCycle = new GS.RelayCommand(
+        //                   async () =>
+        //                   {
+        //                       _isDoliBusy = true;
+        //                       if (ProcessSummary())
+        //                           _doli.ComplexeCycle(_gridGraphDC.NbCycle, _gridGraphDC.DoliInputCollection);
+        //                       else
+        //                           _isDoliBusy = false;
+        //                       //await DoliMovement();
+        //                       _complexCycle.RaiseCanExecuteChanged();
+        //                   }, () => { return !_isDoliBusy; }));
+        //    }
             
-        }
+        //}
 
-        public async Task DoliMovement()
-        {
-            await Task.Run(() =>
-            {
-                //On regarde si le chargement ou la position continue de bouger. Il vaut mieux round, parce qu'égaliser un float ne marche pas souvent quand on mesure des grandeurs physiques.
-                while (Math.Round(_tmpLoad,0) != Math.Round(_doli.DoliLoad,0) && Math.Round(_tmpPos,2) != Math.Round(_doli.DoliPosition,2))
-                {
-                    _tmpLoad = _doli.DoliLoad;
-                    _tmpPos = _doli.DoliPosition;
-                    _isDoliBusy = true;
-                    System.Threading.Thread.Sleep(30000); //30 sec.
-                }
-            });
-        }
+        //public async Task DoliMovement()
+        //{
+        //    await Task.Run(() =>
+        //    {
+        //        //On regarde si le chargement ou la position continue de bouger. Il vaut mieux round, parce qu'égaliser un float ne marche pas souvent quand on mesure des grandeurs physiques.
+        //        while (Math.Round(_tmpLoad,0) != Math.Round(_doli.DoliLoad,0) && Math.Round(_tmpPos,2) != Math.Round(_doli.DoliPosition,2))
+        //        {
+        //            _tmpLoad = _doli.DoliLoad;
+        //            _tmpPos = _doli.DoliPosition;
+        //            _isDoliBusy = true;
+        //            System.Threading.Thread.Sleep(30000); //30 sec.
+        //        }
+        //    });
+        //}
 
 
 

@@ -94,6 +94,7 @@ namespace DauBe_WTF
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            //close all liks (could not find the dedicated DoPE function for that)
             Environment.Exit(0);
         }
         #endregion

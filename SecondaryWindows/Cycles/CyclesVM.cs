@@ -34,7 +34,7 @@ namespace DauBe_WTF.SecondaryWindows.Cycles
         {
             _cycles = new DoPE_Cycles_UC.MVVM.ViewModel();
             doli = _doli;
-            StartCycles = new RelayCommand(o => CyclesCommand());
+            StartCycles = new RelayCommand(o => CyclesCommand(), o=> { return !doli.isDoliBusy; });
         }
 
         #endregion

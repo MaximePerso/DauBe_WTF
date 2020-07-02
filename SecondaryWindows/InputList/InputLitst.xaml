@@ -12,7 +12,7 @@
     </Window.Resources>
     <Grid Background="Teal">
         <uc:GridGraph DataContext="{Binding GridGraphDC}"/>
-        <Button BorderThickness="3" BorderBrush="GhostWhite" Background="Green" Content="Start" Command="{Binding ComplexCycle}" HorizontalAlignment="Left" Margin="942,458,0,0" VerticalAlignment="Top" Width="108" Height="47"/>
+        <Button BorderThickness="3" BorderBrush="GhostWhite" Background="Green" Content="Start" Command="{Binding ComplexCycleCommand}" HorizontalAlignment="Left" Margin="942,458,0,0" VerticalAlignment="Top" Width="108" Height="47"/>
 
     </Grid>
 </Window>

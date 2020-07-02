@@ -31,6 +31,8 @@ namespace DauBe_WTF.ViewModel.SubVM
         private List<double> positionList = new List<double>();
         private List<double> loadList = new List<double>();
         private List<double> extendList = new List<double>();
+        public bool isDoliBusy = false;
+        private string curCommand = string.Empty;
         #endregion
 
         #region MVVM AREA
@@ -538,6 +540,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         private void DoliOff()
         {
             IsDoliOn = false;
+            isDoliBusy = false;
             try
             {
                 DoPE.ERR error = MyEdc.Move.Off();
@@ -610,8 +613,9 @@ namespace DauBe_WTF.ViewModel.SubVM
         {
             Display(string.Format("OnPosMsg: DoPError={0} Reached={1} Time={2} Control={3} Position={4} DControl={5} Destination={6} usTAN={7} \n",
               PosMsg.DoPError, PosMsg.Reached, PosMsg.Time, PosMsg.Control, PosMsg.Position, PosMsg.DControl, PosMsg.Destination, PosMsg.usTAN));
+            isDoliBusy = false;
             // get the control mode defined in the dropping menu
-            DoPE.CTRL control = SelectedMoveCTRL;
+            //DoPE.CTRL control = SelectedMoveCTRL;
             //// if current control mode is position AND the limit load is reached, proc that message
             //if ((control == DoPE.CTRL.POS) & ((Math.Abs(PosMsg.Destination) > Math.Abs(LimLoad) * 0.90)))
             //{
@@ -979,7 +983,10 @@ namespace DauBe_WTF.ViewModel.SubVM
         public void ComplexeCycle(int NbCycles, ObservableCollection<DoliInput> DoliInputCollection)
         {
             //start complexe movement
-            //Error = MyEdc.Combined.StartCMD(NbCycles, DoPE.CMD_MODE.MESSAGE);
+            Error = MyEdc.Combined.StartCMD(NbCycles, DoPE.CMD_MODE.MESSAGE);
+            isDoliBusy = true;
+            curCommand = "Complex Cycle";
+            RecordMovement();
             Log.LogWrite("Beginning combined sequence : nb cycles = " + NbCycles, "Command");
             //execute list of commands
             foreach (var input in DoliInputCollection)
@@ -1007,12 +1014,12 @@ namespace DauBe_WTF.ViewModel.SubVM
 
                     if (input.MoveCtrl == "Halt")
                     {
-                        //MyEdc.Move.HaltW(destCTRL, input.Speed, ref MyTan);
+                        MyEdc.Move.HaltW(destCTRL, input.Speed, ref MyTan);
                         Log.LogWrite("Halt command: DestCtrl = " + input.DestCtrl + ", waiting time = " + input.Speed + "s.", "Command");
                     }
                     else
                     {
-                        //MyEdc.Move.PosExt(moveCTRL, input.Speed, limMode, input.Limit, destCTRL, input.Destination, destMode, ref MyTan);
+                        MyEdc.Move.PosExt(moveCTRL, input.Speed, limMode, input.Limit, destCTRL, input.Destination, destMode, ref MyTan);
                         Log.LogWrite("Move commnad: MoveCtrl = " + input.MoveCtrl + ", speed = " + input.Speed + "unit, LimMode = " + input.LimMode +
                             ", Limit = " + input.Limit + "unit, DestCtrl = " + input.DestCtrl + ", Destination = " + input.Destination +
                             ", DestMode = " + input.DestMode, "Command");
@@ -1025,7 +1032,7 @@ namespace DauBe_WTF.ViewModel.SubVM
                 }
             }
             //stop complex movement
-            //Error = MyEdc.Combined.EndCMD(DoPE.CMD_OPERATION.START);
+            Error = MyEdc.Combined.EndCMD(DoPE.CMD_OPERATION.START);
             Log.LogWrite("End of the combined sequence", "Command");
         }
 
@@ -1035,40 +1042,42 @@ namespace DauBe_WTF.ViewModel.SubVM
         public void Cycles(string MoveCtrl, double Speed1, double Dest1, double Halt1, double Speed2, double Dest2, double Halt2, int Cycles, double Speed, double Destination)
         {
             DoPE.CTRL moveCtrl = DoPE.CTRL.POS;
-            DoPE.CTRL2 isCyclign = ;
+            //DoPE.CTRL2 isCyclign = ;
             if (MoveCtrl == "Load")
                 moveCtrl = DoPE.CTRL.LOAD;
+            isDoliBusy = true;
+            curCommand = "Cycle";
             DoPE.ERR error =  MyEdc.Move.Cycle(moveCtrl, Speed1, Dest1, Halt1, Speed2, Dest2, Halt2, Cycles, Speed, Destination, ref MyTan);
             Display(error.ToString());
             Log.LogWrite("Cycles command : " + MoveCtrl + ", " + Speed1 + ", " + Dest1 + ", " + Halt1 + ", " + Speed2 + ", " + Dest2 + ", " + Halt2 + ", " + Cycles + ", " + Speed + ", " + Destination + ", " + MyTan, "Command") ;
-            while (isCyclign == DoPE.CTRL2.CYCLES_ACTIVE)
-            {
-                timeList.Add(DoliTime);
-                positionList.Add(DoliPosition);
-                loadList.Add(DoliLoad);
-                extendList.Add(DoliExtend);
-            }
+            RecordMovement();
         }
         #endregion
 
 
 
         #region Async function
-        private async Task CycleCompletion(DoPE.CTRL2 isCycleActive)
+        private async Task RecordMovement()
         {
             resetList();
             await Task.Run(() =>
             {
-                while(isCycleActive == DoPE.CTRL2.CYCLES_ACTIVE)
+                while(isDoliBusy == true)
                 {
                     timeList.Add(DoliTime);
                     positionList.Add(DoliPosition);
                     loadList.Add(DoliLoad);
                     extendList.Add(DoliExtend);
+                    Thread.Sleep(100);
                 }
+                //pour choper le point sur lequel le piston s'est arrêté
+                timeList.Add(DoliTime);
+                positionList.Add(DoliPosition);
+                loadList.Add(DoliLoad);
+                extendList.Add(DoliExtend);
             });
 
-            csv.WriteCSV(timeList, positionList, loadList, extendList, "Cycle");
+            csv.WriteCSV(timeList, positionList, loadList, extendList, curCommand);
         }
         #endregion
 
