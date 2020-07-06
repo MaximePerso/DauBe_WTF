@@ -33,6 +33,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         private List<double> extendList = new List<double>();
         public bool isDoliBusy = false;
         private string curCommand = string.Empty;
+        private bool customRecordOn = false;
         #endregion
 
         #region MVVM AREA
@@ -312,6 +313,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         #region "Static" values
         public string[] DoPEItems { get; set; }
         #endregion
+
         #region Commands
         public ICommand DoliOnCommand { get; set; }
         public ICommand DoliOffCommand { get; set; }
@@ -323,7 +325,10 @@ namespace DauBe_WTF.ViewModel.SubVM
         public ICommand LoadBasicTare { get; set; }
         public ICommand PosTare { get; set; }
         public ICommand LoadTare { get; set; }
+        public ICommand StartRecord { get; set; }
+        public ICommand StopRecord { get; set; }
         #endregion
+
         #endregion
 
         #region INITIALISATION
@@ -399,6 +404,8 @@ namespace DauBe_WTF.ViewModel.SubVM
             PosBasicTare = new RelayCommand(o => BasicTare("Position"));
             PosTare = new RelayCommand(o => Tare("Position"));
             LoadTare = new RelayCommand(o => Tare("Load"));
+            StartRecord = new RelayCommand(o => StartManualRecord(), o => { return !customRecordOn; });
+            StopRecord = new RelayCommand(o => StopManualRecord(), o => { return customRecordOn; });
             //AutoPosCommand = new RelayCommand();
         }
         #endregion  
@@ -1054,6 +1061,20 @@ namespace DauBe_WTF.ViewModel.SubVM
         }
         #endregion
 
+        #region Manual Record
+        private void StartManualRecord()
+        {
+            customRecordOn = true;
+            ManualRecordMovement();
+        }
+
+        //juste pour garder de la clarté, cette fonction pourrait être directement écrite dans la définition de la commande
+        private void StopManualRecord()
+        {
+            customRecordOn = false;
+        }
+        #endregion
+
 
 
         #region Async function
@@ -1078,6 +1099,29 @@ namespace DauBe_WTF.ViewModel.SubVM
             });
 
             csv.WriteCSV(timeList, positionList, loadList, extendList, curCommand);
+        }
+
+        private async Task ManualRecordMovement()
+        {
+            resetList();
+            await Task.Run(() =>
+            {
+                while (customRecordOn == true)
+                {
+                    timeList.Add(DoliTime);
+                    positionList.Add(DoliPosition);
+                    loadList.Add(DoliLoad);
+                    extendList.Add(DoliExtend);
+                    Thread.Sleep(100);
+                }
+                //pour choper le point sur lequel le piston s'est arrêté
+                timeList.Add(DoliTime);
+                positionList.Add(DoliPosition);
+                loadList.Add(DoliLoad);
+                extendList.Add(DoliExtend);
+            });
+
+            csv.WriteCSV(timeList, positionList, loadList, extendList, "CustomRecording");
         }
         #endregion
 

@@ -237,6 +237,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="Pictures\arrow.png" />
+    <Resource Include="Pictures\Record.png" />
+    <Resource Include="Pictures\Stop.png" />
+    <Resource Include="Pictures\floppy.png" />
+    <Resource Include="Pictures\folder.png" />
     <Content Include="RealTimeGraphX.dll" />
     <Content Include="RealTimeGraphX.WPF.dll" />
   </ItemGroup>

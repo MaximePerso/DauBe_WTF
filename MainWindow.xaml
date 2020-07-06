@@ -19,12 +19,31 @@
         <main:MainVM/>
     </Window.DataContext>-->
     <Window.Resources>
-        <subvm:DoliVM x:Key="doli"/>
-        <subvm:GraphVM x:Key="graph"/>
-        <main:MainVM x:Key="mainVM"/>
-        <converter:CTRLToUnitStringConverter x:Key="CTRLToUnit"/>
-        <converter:CTRLToDestUnitStringConverter x:Key="CTRLToDestUnit"/>
-        <!--<utility:ViewModelLocator x:Key="locator"/>-->
+        <ResourceDictionary>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="Ivory" BorderThickness="3">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <subvm:DoliVM x:Key="doli"/>
+            <subvm:GraphVM x:Key="graph"/>
+            <main:MainVM x:Key="mainVM"/>
+            <converter:CTRLToUnitStringConverter x:Key="CTRLToUnit"/>
+            <converter:CTRLToDestUnitStringConverter x:Key="CTRLToDestUnit"/>
+            <Image x:Key="RecordImage" Source="Pictures/Record.png"/>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid x:Name="mainGrid" RenderTransformOrigin="0.697,0.415">
@@ -33,8 +52,8 @@
             <ColumnDefinition Width="933*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50*"/>
-            <RowDefinition Height="73*"/>
+            <RowDefinition Height="439*"/>
+            <RowDefinition Height="791*"/>
         </Grid.RowDefinitions>
         <Grid Name="DataDisplay"  Grid.Row="0" Grid.Column="0">
             <StackPanel HorizontalAlignment="Center" Orientation="Vertical" VerticalAlignment="Top" MinHeight="225" MinWidth="790">
@@ -58,7 +77,24 @@
                         <TextBox Height="35" Width="130" Text="{Binding Doli.DoliExtend, StringFormat={}{0:0.00}}"  FontWeight="Bold" FontSize="24" TextAlignment="Center" Background="Black" BorderBrush="White" Foreground="#FF32E00B"/>
                     </StackPanel>
                 </StackPanel>
-                <Separator Margin="30" Width="0"/>
+                <Separator Margin="0,10" Width="0"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Label Content="Record" FontSize="20" FontWeight="Bold"/>
+                    <Separator Margin="10,0" Width="0"/>
+                    <Button Command="{Binding Doli.StartRecord}" Height="40" Width="120">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Pictures/Record.png"/>
+                        </Button.Background>
+                    </Button>
+                    <Separator Margin="10,0" Width="0"/>
+                    <Button Command="{Binding Doli.StopRecord}" Height="40" Width="120">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Pictures/Stop.png"/>
+                        </Button.Background>
+                    </Button>
+                    <Separator Margin="0,10" Width="0"/>
+                </StackPanel>
+                <Separator Margin="0,10" Width="0"/>
                 <StackPanel Margin="0">
                     <RichTextBox x:Name="guiDebug" Height="94" Margin="40,0" VerticalAlignment="Bottom" Width="700" >
                         <FlowDocument>
