@@ -11,33 +11,10 @@
     <Window.Resources>
     </Window.Resources>
     <Grid Background="Teal">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="27*"/>
-            <ColumnDefinition Width="503*"/>
-        </Grid.ColumnDefinitions>
         <Grid Grid.Column="1">
             <uc:GridGraph DataContext="{Binding GridGraphDC}" Grid.Column="1" Margin="0" Height="Auto" Width="Auto"/>
-            <Button BorderThickness="3" BorderBrush="GhostWhite" Background="Green" Content="Start" Command="{Binding ComplexCycleCommand}" HorizontalAlignment="Left" Margin="888,452,0,0" VerticalAlignment="Top" Width="108" Height="47"/>
-        </Grid>
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="106*"/>
-                <RowDefinition Height="433*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Orientation="Vertical">
-                <Separator Margin="5" Width="0"/>
-                <Button Command="{Binding SaveInputList}" Height="30" >
-                    <Button.Background>
-                        <ImageBrush ImageSource="/DauBe_WTF;component/Pictures/floppy.png" Stretch="Uniform"/>
-                    </Button.Background>
-                </Button>
-                <Separator Margin="5" Width="0"/>
-                <Button Command="{Binding SaveInputList}" Height="30" >
-                    <Button.Background>
-                        <ImageBrush ImageSource="/DauBe_WTF;component/Pictures/folder.png" Stretch="Uniform"/>
-                    </Button.Background>
-                </Button>
-            </StackPanel>
+
+            <Button BorderThickness="3" BorderBrush="GhostWhite" Background="Green" Content="Start" Command="{Binding ComplexCycleCommand}" HorizontalAlignment="Left" Margin="942,450,0,0" VerticalAlignment="Top" Width="108" Height="47"/>
         </Grid>
     </Grid>
 </Window>
