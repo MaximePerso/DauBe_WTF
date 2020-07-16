@@ -32,16 +32,17 @@ namespace DauBe_WTF
         private void stop()
         {
             DoPE.ERR error = MyEdc.Move.Halt(DoPE.CTRL.POS, ref MyTan);
-        }
-
-        private void btnEmergency_Click(object sender, EventArgs e)
-        {
-            stop();
+            this.Close();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            stop();
         }
     }
 }

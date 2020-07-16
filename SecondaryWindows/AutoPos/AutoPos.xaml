@@ -13,7 +13,6 @@
     <Window.Resources>
         <ResourceDictionary>
             <cpb:CPBVM x:Key="cpbvm"/>
-            <utiliy:ViewModelLocator x:Key="locator"/>
             <local:AutoPosVM x:Key="autoPos"/>
             <main:MainVM x:Key="mainvm"/>
             <ResourceDictionary.MergedDictionaries>

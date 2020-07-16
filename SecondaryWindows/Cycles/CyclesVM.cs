@@ -13,9 +13,9 @@ namespace DauBe_WTF.SecondaryWindows.Cycles
         #region UC property
 
         private ViewModel.SubVM.DoliVM doli;
-        private DoPE_Cycles_UC.MVVM.ViewModel _cycles;
+        private DoPE_Cycles.MVVM.ViewModel _cycles;
 
-        public DoPE_Cycles_UC.MVVM.ViewModel Cycles
+        public DoPE_Cycles.MVVM.ViewModel Cycles
         {
             get => _cycles;
             set
@@ -32,7 +32,7 @@ namespace DauBe_WTF.SecondaryWindows.Cycles
 
         public CyclesVM(ViewModel.SubVM.DoliVM _doli)
         {
-            _cycles = new DoPE_Cycles_UC.MVVM.ViewModel();
+            _cycles = new DoPE_Cycles.MVVM.ViewModel();
             doli = _doli;
             StartCycles = new RelayCommand(o => CyclesCommand(), o=> { return !doli.isDoliBusy; });
         }
@@ -41,7 +41,7 @@ namespace DauBe_WTF.SecondaryWindows.Cycles
 
         private void CyclesCommand()
         {
-            doli.Cycles(_cycles.MyCycle.MoveCtrl, _cycles.MyCycle.Speed1, _cycles.MyCycle.Dest1, _cycles.MyCycle.Halt1, _cycles.MyCycle.Speed2, _cycles.MyCycle.Dest2, _cycles.MyCycle.Halt2, _cycles.MyCycle.Cycles, _cycles.MyCycle.SpeedFinal, _cycles.MyCycle.DestFinal);
+            doli.Cycles(Cycles.MyCycle.MoveCtrl, Cycles.MyCycle.Speed1, Cycles.MyCycle.Dest1, Cycles.MyCycle.Halt1, Cycles.MyCycle.Speed2, Cycles.MyCycle.Dest2, Cycles.MyCycle.Halt2, Cycles.MyCycle.Cycles, Cycles.MyCycle.SpeedFinal, Cycles.MyCycle.DestFinal);
         }
 
     }

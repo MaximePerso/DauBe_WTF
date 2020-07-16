@@ -11,8 +11,9 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:uc="clr-namespace:InteractiveGraphUserControl;assembly=InteractiveGraphUserControl"
         xmlns:subvm="clr-namespace:DauBe_WTF.ViewModel.SubVM"
+        xmlns:rules="clr-namespace:DauBe_WTF.Rules"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1261" Width="1735" Closing="Window_Closing">
+        Title="MainWindow" Height="1261" Width="1735" Closing="Window_Closing" Loaded="Window_Loaded">
 
     <!--d:DataContext="{d:DesignData Type=local:RealTimeChartsVM, IsDesignTimeCreatable=False}">-->
     <!--<Window.DataContext>
@@ -194,9 +195,9 @@
                                 <Label Content="Move CTRL" HorizontalAlignment="Center"/>
                                 <ComboBox ItemsSource="{Binding Doli.DoPEItems}" SelectedValue="{Binding Doli.ManualCTRL, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Width="120"/>
                                 <Label Content="{Binding Doli.ManualCTRL, Converter={StaticResource CTRLToUnit}}" HorizontalAlignment="Center"/>
-                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.Velocity}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.Velocity, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
                                 <Label Content="{Binding Doli.ManualCTRL, Converter={StaticResource CTRLToDestUnit}}" HorizontalAlignment="Center"/>
-                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.Destination, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center" PreviewTextInput="TextBox_PreviewTextInput"/>
+                                <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.Destination, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
                                 <Separator Margin="30" Width="0"/>
                                 <Button Content="Go" Command="{Binding Doli.DoliGoCommand}" Width="120" Height="40"/>
                             </StackPanel>

@@ -7,13 +7,28 @@
     <ProjectGuid>{7C9A32A2-3734-49CE-9B3D-0DD7FFCEE34E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>DauBe_WTF</RootNamespace>
-    <AssemblyName>DauBe_WTF</AssemblyName>
+    <AssemblyName>AppDoli</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -125,6 +140,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="XamlAnimatedGif, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\XamlAnimatedGif.1.2.2\lib\net45\XamlAnimatedGif.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -136,6 +154,7 @@
     <Compile Include="CircularProgressBar\CPBVM.cs" />
     <Compile Include="Converters\CTRLToDestUnitStringConverter.cs" />
     <Compile Include="Converters\CTRLToUnitStringConverter.cs" />
+    <Compile Include="Rules\TextBoxValidationRule.cs" />
     <Compile Include="SecondaryWindows\AutoPos\AutoPosVM.cs" />
     <Compile Include="SecondaryWindows\Cycles\Cycles.xaml.cs">
       <DependentUpon>Cycles.xaml</DependentUpon>
@@ -145,10 +164,11 @@
     <Compile Include="SecondaryWindows\InputList\InputLitst.xaml.cs">
       <DependentUpon>InputLitst.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SecondaryWindows\Splashscreen\Splashscreen.xaml.cs">
+      <DependentUpon>Splashscreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utility\AsyncCommand.cs" />
-    <Compile Include="Utility\NotifyTaskCompletion.cs" />
     <Compile Include="Utility\SweetSweetCSV.cs" />
-    <Compile Include="Utility\ViewModelLocator.cs" />
     <Compile Include="Utility\WriteLog.cs" />
     <Compile Include="ViewModel\SubVM\DoliVM.cs" />
     <Compile Include="ViewModel\SubVM\GraphVM.cs" />
@@ -191,6 +211,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SecondaryWindows\InputList\InputLitst.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SecondaryWindows\Splashscreen\Splashscreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -241,9 +265,21 @@
     <Resource Include="Pictures\Stop.png" />
     <Resource Include="Pictures\floppy.png" />
     <Resource Include="Pictures\folder.png" />
+    <Resource Include="Pictures\SplashScreen.png" />
     <Content Include="RealTimeGraphX.dll" />
     <Content Include="RealTimeGraphX.WPF.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

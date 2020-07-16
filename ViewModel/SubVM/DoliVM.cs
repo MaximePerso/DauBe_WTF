@@ -19,6 +19,7 @@ using System.Windows.Threading;
 using System.Collections.ObjectModel;
 using InteractiveGraphUserControl.MVVM;
 using System.Windows.Forms;
+using DauBe_WTF.SecondaryWindows.Splashscreen;
 
 namespace DauBe_WTF.ViewModel.SubVM
 {
@@ -34,6 +35,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         public bool isDoliBusy = false;
         private string curCommand = string.Empty;
         private bool customRecordOn = false;
+        private Emergency emergency;
         #endregion
 
         #region MVVM AREA
@@ -412,7 +414,7 @@ namespace DauBe_WTF.ViewModel.SubVM
         ///----------------------------------------------------------------------
         /// <summary>Connect to EDC</summary>
         ///----------------------------------------------------------------------
-        public void ConnectToEdc()
+        public void ConnectToEdc(Splashscreen sc)
         {
             // tell DoPE which DoPENet.dll and DoPE.dll version we are using
             // THE API CANNOT BE USED WITHOUT THIS CHECK !
@@ -471,6 +473,7 @@ namespace DauBe_WTF.ViewModel.SubVM
                     DisplayError(error, "SelectSetup");
                 else
                     Display("SelectSetup : OK !\n");
+                sc.Close();
             }
             catch (DoPEException ex)
             {
@@ -479,6 +482,7 @@ namespace DauBe_WTF.ViewModel.SubVM
                 // Other errors are reported by the DoPE
                 // error return codes.
                 Display(string.Format("{0}\n", ex));
+                sc.Close();
             }
         }
 
@@ -530,10 +534,10 @@ namespace DauBe_WTF.ViewModel.SubVM
             IsDoliOn = true;
             try
             {
+                emergency = new Emergency(MyEdc, MyTan);
+                emergency.Show();
                 DoPE.ERR error = MyEdc.Move.On();
                 DisplayError(error, "On");
-                var emergency = new Emergency(MyEdc, MyTan);
-                //emergency.Show();
             }
             catch (NullReferenceException)
             {
@@ -552,6 +556,7 @@ namespace DauBe_WTF.ViewModel.SubVM
             {
                 DoPE.ERR error = MyEdc.Move.Off();
                 DisplayError(error, "Off");
+                emergency.Close();
             }
             catch (NullReferenceException)
             {

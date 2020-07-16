@@ -5,8 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DauBe_WTF"
         mc:Ignorable="d"
-        Title="Emergency" Height="257.767" Width="271.36" ResizeMode="NoResize" Topmost="True" ShowInTaskbar="False" Closing="Window_Closing">
+        WindowStyle="ToolWindow"
+        Topmost="True"
+        BorderBrush="Black"
+        BorderThickness="10"
+        Height="250" Width="250" ResizeMode="NoResize" ShowInTaskbar="False" Closing="Window_Closing">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
-        <Button Content="STOP" HorizontalAlignment="Left" VerticalAlignment="Top" Width="266" Height="228" FontWeight="Bold" FontSize="72" Background="#FFF30000"/>
+        <Button Content="STOP" FontWeight="Bold" FontSize="72" Background="#FFF30000" Click="Button_Click"/>
     </Grid>
 </Window>

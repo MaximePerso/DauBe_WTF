@@ -90,7 +90,7 @@ namespace DauBe_WTF.ViewModel
             Graph = new SubVM.GraphVM();
             //DOli
             Doli = new SubVM.DoliVM(Graph);
-            Doli.ConnectToEdc();
+            //Doli.ConnectToEdc();
             //Gridgraph usercontrol
             UCVM = new InteractiveGraphUserControl.MVVM.ViewModel(view);
             //Auto positioning windows
