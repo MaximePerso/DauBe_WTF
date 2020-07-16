@@ -37,7 +37,7 @@ namespace DauBe_WTF
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            e.Cancel = true;
+            stop();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

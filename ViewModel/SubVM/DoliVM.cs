@@ -554,9 +554,9 @@ namespace DauBe_WTF.ViewModel.SubVM
             isDoliBusy = false;
             try
             {
+                emergency.Close();
                 DoPE.ERR error = MyEdc.Move.Off();
                 DisplayError(error, "Off");
-                emergency.Close();
             }
             catch (NullReferenceException)
             {
