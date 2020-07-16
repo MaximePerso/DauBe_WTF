@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DauBe_WTF.SecondaryWindows.Cycles"
-        xmlns:uc="clr-namespace:DoPE_Cycles;assembly=DoPE_Cycles_UC"
+        xmlns:uc="clr-namespace:DoPE_Cycles_UC;assembly=DoPE_Cycles_UC"
         mc:Ignorable="d"
         Title="Cycles" Height="450" Width="800">
     <Grid>

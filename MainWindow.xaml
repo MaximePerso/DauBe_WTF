@@ -169,7 +169,7 @@
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Button>
-                                <Label Content="Xhead velocity (mm/min)" HorizontalAlignment="Center"/>
+                                <Label Content="Xhead velocity (mm/s)" HorizontalAlignment="Center"/>
                                 <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.ManualVelocity, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
                                 <Button Content="Down" HorizontalAlignment="Center"  VerticalAlignment="Top" Width="100" Height="122" BorderThickness="0" FontSize="18" FontWeight="ExtraBold">
                                     <Button.Background>
@@ -204,10 +204,7 @@
                         </Grid>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Single CTRL" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
-                    <Grid >
-                    </Grid>
-                </TabItem>
+
                 <TabItem Header="Automatic" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
                     <Grid HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
