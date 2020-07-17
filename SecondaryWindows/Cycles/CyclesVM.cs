@@ -41,8 +41,8 @@ namespace DauBe_WTF.SecondaryWindows.Cycles
 
         private void CyclesCommand()
         {
-            //doli.Cycles(Cycles.MyCycle.MoveCtrl, Cycles.MyCycle.Speed1, Cycles.MyCycle.Dest1, Cycles.MyCycle.Halt1, Cycles.MyCycle.Speed2, Cycles.MyCycle.Dest2, Cycles.MyCycle.Halt2, Cycles.MyCycle.Cycles, Cycles.MyCycle.SpeedFinal, Cycles.MyCycle.DestFinal);
-            Console.WriteLine(Cycles.MyCycle.MoveCtrl + " " + Cycles.MyCycle.Speed1 + " " + _cycles.MyCycle.Dest1 + " " + Cycles.MyCycle.Halt1 + " " + Cycles.MyCycle.Speed2 + " " + Cycles.MyCycle.Dest2 + " " + Cycles.MyCycle.Halt2 + " " + Cycles.MyCycle.Cycles + " " + Cycles.MyCycle.SpeedFinal + " " + Cycles.MyCycle.DestFinal);
+            doli.Cycles(Cycles.MyCycle.MoveCtrl, Cycles.MyCycle.Speed1, Cycles.MyCycle.Dest1, Cycles.MyCycle.Halt1, Cycles.MyCycle.Speed2, Cycles.MyCycle.Dest2, Cycles.MyCycle.Halt2, Cycles.MyCycle.Cycles, Cycles.MyCycle.SpeedFinal, Cycles.MyCycle.DestFinal);
+            //Console.WriteLine(Cycles.MyCycle.MoveCtrl + " " + Cycles.MyCycle.Speed1 + " " + _cycles.MyCycle.Dest1 + " " + Cycles.MyCycle.Halt1 + " " + Cycles.MyCycle.Speed2 + " " + Cycles.MyCycle.Dest2 + " " + Cycles.MyCycle.Halt2 + " " + Cycles.MyCycle.Cycles + " " + Cycles.MyCycle.SpeedFinal + " " + Cycles.MyCycle.DestFinal);
         }
 
     }
