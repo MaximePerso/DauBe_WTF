@@ -152,8 +152,10 @@
     <Compile Include="CircularProgressBar\CircularProgressBar.cs" />
     <Compile Include="CircularProgressBar\Converters.cs" />
     <Compile Include="CircularProgressBar\CPBVM.cs" />
+    <Compile Include="Converters\BtnTextMvntConverter.cs" />
     <Compile Include="Converters\CTRLToDestUnitStringConverter.cs" />
     <Compile Include="Converters\CTRLToUnitStringConverter.cs" />
+    <Compile Include="Converters\MvmntToBackgroundColorConv.cs" />
     <Compile Include="Rules\TextBoxValidationRule.cs" />
     <Compile Include="SecondaryWindows\AutoPos\AutoPosVM.cs" />
     <Compile Include="SecondaryWindows\Cycles\Cycles.xaml.cs">

@@ -43,6 +43,8 @@
             <main:MainVM x:Key="mainVM"/>
             <converter:CTRLToUnitStringConverter x:Key="CTRLToUnit"/>
             <converter:CTRLToDestUnitStringConverter x:Key="CTRLToDestUnit"/>
+            <converter:MvmntToBackgroundColorConv x:Key="MvmntToBg"/>
+            <converter:BtnTextMvntConverter x:Key="TextToMvmnt"/>
             <Image x:Key="RecordImage" Source="Pictures/Record.png"/>
         </ResourceDictionary>
     </Window.Resources>
@@ -130,9 +132,9 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="0" Grid.Column="1">
-            <TabControl HorizontalAlignment="Stretch" Height="Auto" Margin="0,10" VerticalAlignment="Stretch" Width="Auto" TabStripPlacement="Right" BorderThickness="0">
+            <TabControl HorizontalAlignment="Stretch" Height="Auto" Margin="0,10" VerticalAlignment="Stretch" Width="Auto" TabStripPlacement="Right" BorderThickness="0" >
                 <TabItem Header="Manual" Height="100" Width="100" Background="Transparent" BorderBrush="Transparent">
-                    <Grid MinWidth="400" Margin="100,0">
+                    <Grid MinWidth="400" Margin="100,0" Background="{Binding Doli.ManualCTRL, Converter={StaticResource MvmntToBg}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="1*"/>
@@ -199,7 +201,9 @@
                                 <Label Content="{Binding Doli.ManualCTRL, Converter={StaticResource CTRLToDestUnit}}" HorizontalAlignment="Center"/>
                                 <TextBox HorizontalAlignment="Center" Height="23" TextWrapping="Wrap" Text="{Binding Doli.Destination, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" HorizontalContentAlignment="Center"/>
                                 <Separator Margin="30" Width="0"/>
-                                <Button Content="Go" Command="{Binding Doli.DoliGoCommand}" Width="120" Height="40"/>
+                                <Button HorizontalContentAlignment="Center" Command="{Binding Doli.DoliGoCommand}" Width="120" Height="40">
+                                    <TextBlock Text="{Binding Doli.ManualCTRL, Converter={StaticResource TextToMvmnt}}" TextAlignment="Center"/>
+                                </Button>
                             </StackPanel>
                         </Grid>
                     </Grid>

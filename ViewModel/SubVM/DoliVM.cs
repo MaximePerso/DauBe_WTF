@@ -389,7 +389,7 @@ namespace DauBe_WTF.ViewModel.SubVM
             _upperLimLoad = 1000;
             _lowerLimLoad = -1000;
             _manualVelocity = 10;
-            _manualCTRL = DoPE.CTRL.POS;
+            _manualCTRL = DoPE.CTRL.EXTENSION;
             _velocity = 10;
             _curLoadBasicTare = 0;
             _curLoadTare = 0;

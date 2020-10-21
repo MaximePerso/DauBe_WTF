@@ -63,7 +63,7 @@ namespace DauBe_WTF.ViewModel
             { _graph = value; OnPropertyChanged("Graph"); }
         }
     #endregion
-    #region Fields
+        #region Fields
         private bool _isDoliBusy;
         #endregion
         #region Properties
